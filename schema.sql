@@ -10,12 +10,12 @@ CREATE TABLE Users (
 
 CREATE TABLE Photos
 (
-  photoid int  AUTO_INCREMENT,
+  photoid int AUTO_INCREMENT,
   user_id int,
   imgdata longblob ,
   caption VARCHAR(255),
   INDEX upid_idx (user_id),
-  CONSTRAINT pictures_pk PRIMARY KEY (picture_id)
+  CONSTRAINT pictures_pk PRIMARY KEY (photoid)
 );
 
 CREATE TABLE Owns_Albums
@@ -24,14 +24,6 @@ CREATE TABLE Owns_Albums
   album_id INT,
   FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
   FOREIGN KEY(album_id) REFERENCES Albums(albumid) ON DELETE CASCADE
-);
-
-CREATE TABLE Belongs_To
-(
-  photoID INT, albumID INT NOT NULL,
-  PRIMARY KEY(photoID),
-  FOREIGN KEY(photoID) REFERENCES Photos(photoid) ON DELETE CASCADE,
-  FOREIGN KEY(albumID) REFERENCES Albums(albumid) ON DELETE CASCADE
 );
 
 CREATE TABLE Belongs_To
@@ -60,10 +52,10 @@ CREATE TABLE Comments
 
 CREATE TABLE Has_Comment
 (
-  commentid INT, photoid INT,
-  PRIMARY KEY(commentID, photoID),
-  FOREIGN KEY(commentID) REFERENCES Comment(commentID) ON DELETE CASCADE,
-  FOREIGN KEY(photoID) REFERENCES Photos(photoID) ON DELETE CASCADE
+  commentID INT, photoid INT,
+  PRIMARY KEY(commentID, photoid),
+  FOREIGN KEY(commentID) REFERENCES Comments(commentID) ON DELETE CASCADE,
+  FOREIGN KEY(photoid) REFERENCES Photos(photoid) ON DELETE CASCADE
 );
 
 CREATE TABLE Tags
