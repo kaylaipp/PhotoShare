@@ -78,14 +78,12 @@ def request_loader(request):
     user.is_authenticated = request.form['password'] == pwd
     return user
 
-
 '''
 A new page looks like this:
 @app.route('new_page_name')
 def new_page_function():
 	return new_page_html
 '''
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -216,9 +214,7 @@ def upload_file():
     else:
         return render_template('upload.html')
 
-
 # end photo uploading code
-
 
 # default page
 @app.route("/", methods=['GET'])

@@ -7,13 +7,30 @@
 {% endif %}
     <body>
         <div class="title">
-            <h1>Enter your information below</h1>
+            <h1>Create Your Photoshare account!</h1>
+            <h2>Enter your information below</h2>
         </div>
         <div id="content">
             <form method="post" action="{{ url_for('register_user') }}">
+                <label for="firstname">First name:</label>
+                <input type="text" name="firstname"/><br/>
+
+                <label for="firstname">Last name:</label>
+                <input type="text" name="lastname"/><br/>
+
+                <label for="username">Username:</label>
+                <input type="text" name="username"/><br/>
+
                 <label for="email">Enter your email:</label>
                 <input type="email" name="email" /><br />
+
+                <label for="DOB">Date of Birth (MM/DD/YY):</label>
+                <input type="date" name="DOB"/><br/>
+
                 <label for="password">Enter password:</label>
+                <input type="password" name="password" /><br />
+
+                <label for="password">Re-enter password:</label>
                 <input type="password" name="password" /><br />
                 <input type="submit" />
             </form>
