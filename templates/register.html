@@ -1,5 +1,9 @@
 <!-- author ben lawson balawson@bu.edu -->
 <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <title>Create an account!</title>
 </head>
 {%if not supress%}
@@ -10,7 +14,7 @@
             <h1>Create Your Photoshare account!</h1>
             <h2>Enter your information below</h2>
         </div>
-        <div id="content">
+        <div id="register_content">
             <form method="post" action="{{ url_for('register_user') }}">
                 <label for="firstname">First name:</label>
                 <input type="text" name="firstname"/><br/>
