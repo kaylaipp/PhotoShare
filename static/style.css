@@ -1,0 +1,27 @@
+h1{
+    text-align: center;
+}
+.centerbuttons{
+    position: relative;
+    left:33%;
+}
+
+html, body {
+    height: 100%;
+}
+
+html {
+    display: table;
+    margin: auto;
+}
+
+body {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+ul{
+    position: relative;
+    left: 35%;
+    padding: 3%
+}

@@ -3,8 +3,12 @@ USE photoshare;
 
 CREATE TABLE Users (
     user_id int  AUTO_INCREMENT,
+    firstname VARCHAR(100),
+    lastname VARCHAR(100),
+    username VARCHAR(20),
     email varchar(255) UNIQUE,
     password varchar(255),
+    DOB DATE,
   CONSTRAINT users_pk PRIMARY KEY (user_id)
 );
 
