@@ -27,7 +27,7 @@ CREATE TABLE Owns_Albums
   user_id INT,
   album_id INT,
   FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-  FOREIGN KEY(album_id) REFERENCES Albums(albumid) ON DELETE CASCADE
+  FOREIGN KEY(album_id) REFERENCES Albums(albumID) ON DELETE CASCADE
 );
 
 CREATE TABLE Belongs_To
@@ -35,7 +35,7 @@ CREATE TABLE Belongs_To
   photoID INT, albumID INT NOT NULL,
   PRIMARY KEY(photoID),
   FOREIGN KEY(photoID) REFERENCES Photos(photoid) ON DELETE CASCADE,
-  FOREIGN KEY(albumID) REFERENCES Albums(albumid) ON DELETE CASCADE
+  FOREIGN KEY(albumID) REFERENCES Albums(albumID) ON DELETE CASCADE
 );
 
 CREATE TABLE Albums

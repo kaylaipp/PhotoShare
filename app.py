@@ -6,7 +6,7 @@
 # CodeHandBook at http://codehandbook.org/python-web-application-development-using-flask-and-mysql/
 # and MaxCountryMan at https://github.com/maxcountryman/flask-login/
 # and Flask Offical Tutorial at  http://flask.pocoo.org/docs/0.10/patterns/fileuploads/
-# see links for further understanding
+# see links for further und0000erstanding
 ###################################################
 
 import flask
@@ -28,7 +28,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -138,17 +139,19 @@ def register_user():
         password = request.form.get('password')
         firstname = request.form.get('firstname')
         lastname = request.form.get('lastname')
-        username  =request.form.get('username')
-        #DOB =  request.form.get('DOB')          #produces error for some reason :(
+        username = request.form.get('username')
+        DOB = request.form.get('DOB')          # produces error for some reason :(
+                                               # works for me! try dropping your old photoshare db  -Y
+                                               # and making a whole new one with the schema code maybe?
     except:
         print("couldn't find all tokens")  # this prints to shell, end users will not see this (all print statements go to shell)
         return flask.redirect(flask.url_for('register'))
     cursor = conn.cursor()
     test = isEmailUnique(email)
     if test:
-        print(cursor.execute("INSERT INTO Users (email, password,firstname, lastname, username)"
-                             "VALUES ('{0}', '{1}','{2}', '{3}','{4}')".format(email, password,
-                              firstname, lastname,username)))
+        print(cursor.execute("INSERT INTO Users (email, password,firstname, lastname, username, DOB)"
+                             "VALUES ('{0}', '{1}','{2}', '{3}','{4}', '{5}')".format(email, password,
+                              firstname, lastname,username,DOB)))
         conn.commit()
 
         # log user in
@@ -228,7 +231,7 @@ def upload_file():
 # default page
 @app.route("/", methods=['GET'])
 def hello():
-    return render_template('hello.html', message='Welecome to Photoshare')
+    return render_template('hello.html', message='Welcome to Photoshare')
 
 
 if __name__ == "__main__":
