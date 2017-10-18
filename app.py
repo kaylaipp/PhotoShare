@@ -211,13 +211,14 @@ def allowed_file(filename):
 def create_album():
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
-		album_title = request.form.get('album_title')
-		print(album_title)
-		if (album_title):
+		name = request.form.get('album_title')
+		print(name)
+		if (name):
 			cursor = conn.cursor()
 			date = time.strftime("%Y-%m-%d")
-			cursor.execute("INSERT INTO Albums(album_title, user_id, date_of_creation) VALUES('{0}', '{1}', '{2}')".format(album_title,uid,date))
+			cursor.execute("INSERT INTO Albums(name, albumOwner, date) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
 			conn.commit()
+            # should also pudate belongs_to table
 			return render_template('hello.html', message='Album Created!', )#albums=getUsersAlbums(uid))
 		else:
 			return render_template('new_album.html', message="Choose an album title")

@@ -40,8 +40,9 @@ CREATE TABLE Belongs_To
 
 CREATE TABLE Albums
 (
-  albumID INT, name VARCHAR(30), datecreated DATE,
-  PRIMARY KEY(albumID)
+  albumID INT, albumOwner INT, name VARCHAR(30), datecreated DATE,
+  PRIMARY KEY(albumID),
+  FOREIGN KEY(albumOwner) references Users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Comments
