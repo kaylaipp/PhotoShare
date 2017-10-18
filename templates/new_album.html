@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+
+{% if message %}
+  <h4>{{message}}!</h4>
+{% endif %}
+
+<ul>
+	<form method="post" action="/new_album">
+		<label for="album">Album name:</label>
+		<input type="text" name="album_title"><br>
+		<input type="submit" value="Create Album" /><br>
+	</form>
+</ul>
+<a href='/'>Home</a>
+<a href='/logout'>Logout</a>

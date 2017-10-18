@@ -16,6 +16,7 @@ from flaskext.mysql import MySQL
 #import flask.ext.login as flask_login
 #from flask.ext.login import LoginManager
 import flask_login
+import time
 
 
 # for image uploading
@@ -205,6 +206,23 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+@app.route('/create_album', methods=['GET', 'POST'])
+@flask_login.login_required
+def create_album():
+	if request.method == 'POST':
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+		album_title = request.form.get('album_title')
+		print(album_title)
+		if (album_title):
+			cursor = conn.cursor()
+			date = time.strftime("%Y-%m-%d")
+			cursor.execute("INSERT INTO Albums(album_title, user_id, date_of_creation) VALUES('{0}', '{1}', '{2}')".format(album_title,uid,date))
+			conn.commit()
+			return render_template('hello.html', message='Album Created!', )#albums=getUsersAlbums(uid))
+		else:
+			return render_template('new_album.html', message="Choose an album title")
+	else:
+		return render_template('new_album.html')
 
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
@@ -217,8 +235,9 @@ def upload_file():
         photo_data = base64.standard_b64encode(imgfile.read())
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO Pictures (imgdata, user_id, caption) VALUES ('{0}', '{1}', '{2}' )".format(photo_data, uid,
-                                                                                                    caption))
+            "INSERT INTO Pictures(imgdata, user_id, caption) \
+             VALUES ('{0}', '{1}', '{2}' )".format(photo_data, uid, caption))
+            # getting a mysql syntax error when trying to upload but IDK WHY
         conn.commit()
         return render_template('hello.html', name=flask_login.current_user.id, message='Photo uploaded!',
                                photos=getUsersPhotos(uid))
