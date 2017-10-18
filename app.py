@@ -208,7 +208,7 @@ def allowed_file(filename):
 
 @app.route('/new_album', methods=['GET', 'POST'])
 @flask_login.login_required
-def create_album():
+def create_album(): #i can get new albums to be created and inserted into the Albums table in the DB
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		albumName = request.form.get('album_title')
@@ -218,7 +218,7 @@ def create_album():
 			date = time.strftime("%Y-%m-%d")
 			cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
 			conn.commit()
-            # should also pudate belongs_to table
+            # should also update belongs_to table
 			return render_template('hello.html', message='Album Created!', )#albums=getUsersAlbums(uid))
 		else:
 			return render_template('new_album.html', message="Choose an album title")
