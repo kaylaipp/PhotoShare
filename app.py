@@ -216,7 +216,7 @@ def create_album():
 		if (albumName):
 			cursor = conn.cursor()
 			date = time.strftime("%Y-%m-%d")
-			cursor.execute("INSERT INTO Albums(name, albumOwner, date) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
+			cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
 			conn.commit()
             # should also pudate belongs_to table
 			return render_template('hello.html', message='Album Created!', )#albums=getUsersAlbums(uid))

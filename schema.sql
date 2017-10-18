@@ -96,5 +96,7 @@ CREATE TABLE Likes
 );
 
 
-INSERT INTO Users (email, password) VALUES ('test@bu.edu', 'test');
+INSERT INTO Users (firstname, lastname,username, email, password)
+VALUES ('Yuta', 'Takano','test2','test2@bu.edu', 'test');
+INSERT INTO Users (email, password) VALUES ('test1@bu.edu', 'test');
 INSERT INTO Users (email, password) VALUES ('test1@bu.edu', 'test');
