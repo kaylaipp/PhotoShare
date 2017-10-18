@@ -206,7 +206,7 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-@app.route('/create_album', methods=['GET', 'POST'])
+@app.route('/new_album', methods=['GET', 'POST'])
 @flask_login.login_required
 def create_album():
 	if request.method == 'POST':
