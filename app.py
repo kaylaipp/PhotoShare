@@ -211,9 +211,9 @@ def allowed_file(filename):
 def create_album():
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
-		name = request.form.get('album_title')
-		print(name)
-		if (name):
+		albumName = request.form.get('album_title')
+		print(albumName)
+		if (albumName):
 			cursor = conn.cursor()
 			date = time.strftime("%Y-%m-%d")
 			cursor.execute("INSERT INTO Albums(name, albumOwner, date) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
