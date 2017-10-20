@@ -12,12 +12,19 @@
 
 <title>Welcome To Your Profile</title>
 <h1>Welcome To Your Profile, {{ firstname }}!</h1>
+
+
 {%  if albums %}
-<h2>Your photos</h2>
+<h2>Your Albums</h2>
     <ul>
     {% for album in albums %}
 
-        <li>{{album}}<br>
+        <div id="select_album">
+            <form method="post" action="{{ url_for('create_album') }}">
+                <label for="firstname">First name:</label>
+                <input type="text" album={{ album }}/><br/>
+            </form>
+        </div>
 
     {% endfor %}
     </ul>
@@ -37,6 +44,14 @@
 {% if message is none %}
   <p>You should <a href='/login'>login!</a></p>
 {% endif %}
+
+
+
+
+
+
+
+
 
     <ul>
         <li><a href='/new_album'>Create new album</a></li>
