@@ -1,45 +1,24 @@
-<!-- author ben lawson (balawson@bu.edu) -->
+
+
 <!doctype html>
 <head>
-        <<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <!--<link rel="stylesheet" href="https://github.com/kaylaipp/PhotoShare/blob/master/templates/pastylesheet.css">
-        -->
+    <!--bootstrap-->
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="../static/style.css">
 </head>
-<body>
-{% if message %}
-  <h4>{{message}}!</h4>
-{% endif %}
-<title>Photoshare</title>
-{% if firstname %}
-  <h1>Hello {{ firstname }}!</h1>
-{% endif %}
+<title> Photoshare</title>
+<h1> Login or create an account to begin</h1>
 
-{% if photos %}
-<h2>Here's your photos</h2>
-    <ul>
-    {% for photo in photos %}
-
-        <li>{{photo[2]}}<br>
-        <img src='data:image/png;base64, {{photo[0]}}'/></li>
-    {% endfor %}
-    </ul>
-{% endif %}
-
-{% if message is none %}
-  <p>You should <a href='/login'>login!</a></p>
-{% else %}
-  <p> Go to <a href='/profile'>profile?</a></p>
-{% endif %}
-
-    <ul>
-        <li><a href='/new_album'>Create new album</a> </li>
-        <li><a href='/upload'>Upload a photo</a> </li>
-        <li><a href='/logout'>Logout</a></li>
-        <li><a href='/'>Home</a></li>
-    </ul>
-</body>
+<div class="centerbuttons">
+    <a href='/login' class="btn btn-info" role="button">Login</a>
+    <a href='/register' class="btn btn-info" role="button">Create Account</a>
+</div>
 
 
+<ul>
+    <li><a href='/upload'>Upload a photo</a> </li>
+    <li><a href='/logout'>Logout</a></li>
+    <li><a href='/'>Home</a></li>
+</ul>
