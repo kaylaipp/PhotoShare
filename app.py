@@ -166,6 +166,11 @@ def getUsersPhotos(uid):
     cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id = '{0}'".format(uid))
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
+def getUsersAlbums(uid):
+    cursor = conn.cursor()
+    cursor.execute("SELECT name, datecreated  FROM Albums WHERE user_id = '{0}'".format(uid))
+    return cursor.fetchall()
+
 
 def getUserIdFromEmail(email):
     cursor = conn.cursor()
@@ -193,7 +198,7 @@ def isEmailUnique(email):
 @flask_login.login_required
 def protected():
     name = getNameFromEmail(flask_login.current_user.id)
-    return render_template('profile.html', name=flask_login.current_user.id, firstname=name)
+    return render_template('profile.html', name=flask_login.current_user.id, firstname=name, albums=getUsersAlbums(getUserIdFromEmail(flask_login.current_user.id)))
 
 
 # begin photo uploading code
