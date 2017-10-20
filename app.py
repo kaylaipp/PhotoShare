@@ -157,8 +157,8 @@ def register_user():
         print("couldn't find all tokens")
         #message = "email already in use!"
         #return message
-        #return render_template('register.html', supress='True')
-        return flask.redirect(flask.url_for('register'))
+        return render_template('register.html', supress='False')
+        #return flask.redirect(flask.url_for('register'))
 
 
 def getUsersPhotos(uid):
