@@ -12,7 +12,16 @@
 
 <title>Welcome To Your Profile</title>
 <h1>Welcome To Your Profile, {{ firstname }}!</h1>
+{%  if albums %}
+<h2>Your photos</h2>
+    <ul>
+    {% for album in albums %}
 
+        <li>{{album}}<br>
+
+    {% endfor %}
+    </ul>
+{%  endif  %}
 
 {% if photos %}
 <h2>Your photos</h2>
