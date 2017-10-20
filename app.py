@@ -192,7 +192,9 @@ def isEmailUnique(email):
 @app.route('/profile')
 @flask_login.login_required
 def protected():
-    return render_template('profile.html', name=flask_login.current_user.id)
+    name = getNameFromEmail(flask_login.current_user.id)
+    print(name)
+    return render_template('profile.html', name=flask_login.current_user.id, firstname=name)
     #I want to also pass in the current user's first name but idk how
 
 
@@ -249,8 +251,7 @@ def upload_file():
 # default page
 @app.route("/", methods=['GET'])
 def hello():
-    name = getNameFromEmail(flask_login.current_user.id)
-    return render_template('hello.html', message='Welcome to Photoshare', firstname=name)
+    return render_template('hello.html', message='Welcome to Photoshare')
 
 
 if __name__ == "__main__":
