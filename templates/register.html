@@ -6,12 +6,12 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <title>Create an account!</title>
 </head>
-{%if not supress%}
-<h1> Email already in use! Use another one or <a href="/login">login</a></h1>
-{% endif %}
     <body>
         <div class="title">
             <h1>Create Your Photoshare account!</h1>
+            {%if not supress%}
+            <h3 style="color: red"> Email already in use! Use another one or <a href="/login">login</a></h3>
+            {% endif %}
             <h2>Enter your information below</h2>
         </div>
         <div id="register_content">
