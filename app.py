@@ -167,8 +167,8 @@ def view_album():
         photos = getPhotosFromAlbum(getUserIdFromEmail(),album[1]) #how can I get the album id ?????
     except:
         print("couldn't find all tokens")
-        return flask.redirect(flask.url_for('profile.html'))
-    return render_template('view_album.html', album = album[0], photos = photos)
+        return render_template('view_album.html', album=album[0], albumid = album[1])
+    return render_template('view_album.html', album = album[0], photos = photos, albumid = album[1])
 
 
 
