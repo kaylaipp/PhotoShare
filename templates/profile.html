@@ -12,9 +12,10 @@
 
 <title>Welcome To Your Profile</title>
 
-{ % if not uid % }
+{% if not uid %}
 <meta http-equiv="refresh" content=0; url='/unauth' />
 {% endif %}
+
 {% if firstname %}
   <h1>Hello {{ firstname }}!</h1>
 {% endif %}
