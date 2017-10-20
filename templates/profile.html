@@ -13,6 +13,9 @@
 <title>Welcome To Your Profile</title>
 <h1>Welcome To Your Profile, {{ firstname }}!</h1>
 
+{% if message  %}
+  <p>{{ message }}</p>
+{% endif %}
 
 {%  if albums %}
 <h2>Your Albums</h2>
@@ -20,9 +23,8 @@
     {% for album in albums %}
 
         <div id="select_album">
-            <form method="post" action="{{ url_for('create_album') }}">
-                <label for="album">{{ album }}</label>
-                <input type="submit" value = "View Album"/><br/>
+            <form method="post" action="{{ url_for('view_album') }}">
+                <input type="submit" value = {{ album }} name="view_album"/><br/>
             </form>
         </div>
 
@@ -44,8 +46,6 @@
 {% if message is none %}
   <p>You should <a href='/login'>login!</a></p>
 {% endif %}
-
-
 
 
 

@@ -16,10 +16,13 @@ CREATE TABLE Photos
 (
   photoid int AUTO_INCREMENT,
   user_id int,
+  album_id int,
   imgdata longblob ,
   caption VARCHAR(255),
   INDEX upid_idx (user_id),
-  CONSTRAINT pictures_pk PRIMARY KEY (photoid)
+  CONSTRAINT pictures_pk PRIMARY KEY (photoid),
+  FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY(album_id) REFERENCES Albums(albumID) ON DELETE CASCADE
 );
 
 CREATE TABLE Owns_Albums

@@ -160,16 +160,39 @@ def register_user():
         return render_template('register.html', supress=False)
         #return flask.redirect(flask.url_for('register'))
 
+@app.route("/view_album", methods=['POST'])
+def view_album():
+    try:
+        album = request.form.get('view_album')
+        photos = getPhotosFromAlbum(getUserIdFromEmail(),) #how can I get the album id ?????
+    except:
+        print("couldn't find all tokens")
+        return render_template('profile.html', message='Unable to open album')
+    return render_template('view_album.html', album = album, photos = photos)
+
+
 
 def getUsersPhotos(uid):
     cursor = conn.cursor()
     cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id = '{0}'".format(uid))
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
+def getPhotosFromAlbum(uid,albumid):
+    cursor = conn.cursor()
+    cursor.execute("SELECT imgdata, picture_id, caption FROM Photos \
+                    WHERE Photos.user_id = '{0}' AND Photos.album_id = '{1}'".format(uid,albumid))
+    return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
+
 def getUsersAlbums(uid):
     cursor = conn.cursor()
-    cursor.execute("SELECT name FROM Albums WHERE albumOwner = '{0}'".format(uid))
+    cursor.execute("SELECT name, albumID FROM Albums WHERE albumOwner = '{0}'".format(uid))
     return cursor.fetchall()
+
+
+# def getAlbumID(uid):
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT albumID FROM Albums WHERE albumOwner = '{0}'".format(uid))
+#     return cursor.fetchall()
 
 
 def getUserIdFromEmail(email):
@@ -198,7 +221,8 @@ def isEmailUnique(email):
 @flask_login.login_required
 def protected():
     name = getNameFromEmail(flask_login.current_user.id)
-    return render_template('profile.html', name=flask_login.current_user.id, firstname=name, albums=getUsersAlbums(getUserIdFromEmail(flask_login.current_user.id)))
+    user = getUserIdFromEmail(flask_login.current_user.id)
+    return render_template('profile.html', name=flask_login.current_user.id, firstname=name, albums=getUsersAlbums(user))
 
 
 # begin photo uploading code
@@ -212,19 +236,19 @@ def allowed_file(filename):
 @app.route('/new_album', methods=['GET', 'POST'])
 @flask_login.login_required
 def create_album(): #i can get new albums to be created and inserted into the Albums table in the DB
-	if request.method == 'POST':
-		uid = getUserIdFromEmail(flask_login.current_user.id)
-		albumName = request.form.get('album_title')
-		print(albumName)
-		if (albumName):
-			cursor = conn.cursor()
-			date = time.strftime("%Y-%m-%d")
-			cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
-			return render_template('new_album.html', message='Album Created!', supress = False)#albums=getUsersAlbums(uid))
-		else:
-			return render_template('new_album.html', message="Choose an album title", supress = True)
-	else:
-		return render_template('new_album.html', supress = True)
+    if request.method == 'POST':
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        albumName = request.form.get('album_title')
+        print(albumName)
+        if (albumName):
+            cursor = conn.cursor()
+            date = time.strftime("%Y-%m-%d")
+            cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
+            return render_template('new_album.html', message='Album Created!', supress = False)#albums=getUsersAlbums(uid))
+        else:
+            return render_template('new_album.html', message="Choose an album title", supress = True)
+    else:
+        return render_template('new_album.html', supress = True)
 
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
