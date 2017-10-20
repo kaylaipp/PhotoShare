@@ -188,7 +188,7 @@ def isEmailUnique(email):
 @app.route('/profile')
 @flask_login.login_required
 def protected():
-    return render_template('profile.html', name=flask_login.current_user.id, message="Here's your profile")
+    return render_template('profile.html', name=flask_login.current_user.id)
 
 
 # begin photo uploading code
