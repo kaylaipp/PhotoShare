@@ -21,8 +21,8 @@
 
         <div id="select_album">
             <form method="post" action="{{ url_for('create_album') }}">
-                <label for="firstname">First name:</label>
-                <input type="text" album={{ album }}/><br/>
+                <label for="album">{{ album }}</label>
+                <input type="button" album= "View Album"/><br/>
             </form>
         </div>
 
