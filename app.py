@@ -168,7 +168,7 @@ def getUsersPhotos(uid):
 
 def getUsersAlbums(uid):
     cursor = conn.cursor()
-    cursor.execute("SELECT name, datecreated  FROM Albums WHERE user_id = '{0}'".format(uid))
+    cursor.execute("SELECT name, datecreated  FROM Albums WHERE albumOwner = '{0}'".format(uid))
     return cursor.fetchall()
 
 
