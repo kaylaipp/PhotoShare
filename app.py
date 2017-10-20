@@ -164,11 +164,11 @@ def register_user():
 def view_album():
     try:
         album = request.form.get('view_album')
-        photos = getPhotosFromAlbum(getUserIdFromEmail(),) #how can I get the album id ?????
+        photos = getPhotosFromAlbum(getUserIdFromEmail(),album[1]) #how can I get the album id ?????
     except:
         print("couldn't find all tokens")
-        return flask.redirect(flask.url_for('profile'))
-    return render_template('view_album.html', album = album, photos = photos)
+        return flask.redirect(flask.url_for('profile.html'))
+    return render_template('view_album.html', album = album[0], photos = photos)
 
 
 
