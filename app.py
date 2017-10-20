@@ -163,15 +163,17 @@ def register_user():
 @app.route("/view_album", methods=['POST'])
 def view_album():
     album = request.form.get('view_album')
-    albumname = album[2,-2]
+    albumname = album[2:-2]
     try:
         print(album[1])
-        photos = getPhotosFromAlbum(getUserIdFromEmail(),album[1]) #how can I get the album id ?????
+        photos = getPhotosFromAlbum(getUserIdFromEmail(),album[1]) #how can I get the album id ???????????
     except:
         print("couldn't find all tokens")
         return render_template('view_album.html', album=albumname, albumid = album[1])
-    return render_template('view_album.html', album = albumname, photos = photos, albumid = album[1])
-
+    return render_template('view_album.html', album = albumname, photos = photos, albumid = album)
+## need to figure out how to get the album id so I can pass it into view_album which can then be passed
+## from there into upload -- bc I want only to be able to upload from within an album
+## UNLESS it's easier to do a general upload and have the user select which album to upload into?
 
 
 def getUsersPhotos(uid):
