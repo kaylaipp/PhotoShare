@@ -117,7 +117,7 @@ def logout():
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return render_template('unauth.html')
+    return render_template('hello.html', message = 'Please log in or create an account')
 
 
 # you can specify specific methods (GET/POST) in function header instead of inside the functions as seen earlier
@@ -212,7 +212,7 @@ def create_album(): #i can get new albums to be created and inserted into the Al
 			cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
 			conn.commit()
             # should also update belongs_to table
-			return render_template('hello.html', message='Album Created!', )#albums=getUsersAlbums(uid))
+			return render_template('profile.html', message='Album Created!', )#albums=getUsersAlbums(uid))
 		else:
 			return render_template('new_album.html', message="Choose an album title")
 	else:
