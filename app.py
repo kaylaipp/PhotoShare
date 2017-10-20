@@ -215,11 +215,11 @@ def create_album(): #i can get new albums to be created and inserted into the Al
 			cursor = conn.cursor()
 			date = time.strftime("%Y-%m-%d")
 			cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
-			return render_template('new_album.html', message='Album Created!' )#albums=getUsersAlbums(uid))
+			return render_template('new_album.html', message='Album Created!', supress = 'False')#albums=getUsersAlbums(uid))
 		else:
-			return render_template('new_album.html', message="Choose an album title")
+			return render_template('new_album.html', message="Choose an album title", supress = 'True')
 	else:
-		return render_template('new_album.html')
+		return render_template('new_album.html', supress = 'False')
 
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
