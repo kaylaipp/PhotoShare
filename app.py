@@ -172,6 +172,10 @@ def getUserIdFromEmail(email):
     cursor.execute("SELECT user_id  FROM Users WHERE email = '{0}'".format(email))
     return cursor.fetchone()[0]
 
+def getNameFromEmail(email):
+    cursor = conn.cursor()
+    cursor.execute("SELECT firstname  FROM Users WHERE email = '{0}'".format(email))
+    return cursor.fetchone()[0]
 
 def isEmailUnique(email):
     # use this to check if a email has already been registered
@@ -188,7 +192,8 @@ def isEmailUnique(email):
 @app.route('/profile')
 @flask_login.login_required
 def protected():
-    return render_template('profile.html', name=flask_login.current_user.id, firstname = flask_login.current_user.firstname)
+    return render_template('profile.html', name=flask_login.current_user.id)
+    #I want to also pass in the current user's first name but idk how
 
 
 # begin photo uploading code
@@ -244,7 +249,8 @@ def upload_file():
 # default page
 @app.route("/", methods=['GET'])
 def hello():
-    return render_template('hello.html', message='Welcome to Photoshare')
+    name = getNameFromEmail(flask_login.current_user.id)
+    return render_template('hello.html', message='Welcome to Photoshare', firstname=name)
 
 
 if __name__ == "__main__":
