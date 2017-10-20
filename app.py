@@ -152,7 +152,7 @@ def register_user():
         user = User()
         user.id = email
         flask_login.login_user(user)
-        return render_template('hello.html', name=firstname, message='Account Created!')
+        return render_template('profile.html', name=firstname, message='Account Created!')
     else:
         print("couldn't find all tokens")
         #message = "email already in use!"
