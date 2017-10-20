@@ -162,9 +162,9 @@ def register_user():
 
 @app.route("/view_album", methods=['POST'])
 def view_album():
+    album = request.form.get('view_album')
+    albumname = album[2, -1]
     try:
-        album = request.form.get('view_album')
-        albumname = album[2,-1]
         print(album[1])
         photos = getPhotosFromAlbum(getUserIdFromEmail(),album[1]) #how can I get the album id ?????
     except:
