@@ -30,6 +30,14 @@ CREATE TABLE Owns_Albums
   FOREIGN KEY(album_id) REFERENCES Albums(albumID) ON DELETE CASCADE
 );
 
+CREATE TRIGGER owns_albums
+  AFTER INSERT ON Albums
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO Owns_Albums(user_id, album_id) VALUES(:new.albumOwner,:new.albumID);
+  END;
+
+
 CREATE TABLE Belongs_To
 (
   photoID INT, albumID INT NOT NULL,

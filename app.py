@@ -193,9 +193,7 @@ def isEmailUnique(email):
 @flask_login.login_required
 def protected():
     name = getNameFromEmail(flask_login.current_user.id)
-    print(name)
     return render_template('profile.html', name=flask_login.current_user.id, firstname=name)
-    #I want to also pass in the current user's first name but idk how
 
 
 # begin photo uploading code
@@ -217,8 +215,6 @@ def create_album(): #i can get new albums to be created and inserted into the Al
 			cursor = conn.cursor()
 			date = time.strftime("%Y-%m-%d")
 			cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
-			conn.commit()
-            # should also update belongs_to table
 			return render_template('profile.html', message='Album Created!', )#albums=getUsersAlbums(uid))
 		else:
 			return render_template('new_album.html', message="Choose an album title")

@@ -11,11 +11,8 @@
 <body>
 
 <title>Welcome To Your Profile</title>
-<h1>Welcome To Your Profile</h1>
+<h1>Welcome To Your Profile, {{ firstname }}!</h1>
 
-{% if firstname %}
-  <h1>Hello {{ firstname }}!</h1>
-{% endif %}
 
 {% if photos %}
 <h2>Your photos</h2>
