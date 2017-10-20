@@ -164,6 +164,7 @@ def register_user():
 def view_album():
     try:
         album = request.form.get('view_album')
+        print(album)
         photos = getPhotosFromAlbum(getUserIdFromEmail(),album[1]) #how can I get the album id ?????
     except:
         print("couldn't find all tokens")
