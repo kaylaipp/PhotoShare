@@ -14,10 +14,10 @@ CREATE TABLE Users (
 
 CREATE TABLE Photos
 (
-  photoid int AUTO_INCREMENT,
-  user_id int,
-  album_id int,
-  imgdata longblob ,
+  photoid INT AUTO_INCREMENT,
+  user_id INT,
+  album_id INT,
+  imgdata LONGBLOB ,
   caption VARCHAR(255),
   INDEX upid_idx (user_id),
   CONSTRAINT pictures_pk PRIMARY KEY (photoid),
@@ -53,7 +53,7 @@ CREATE TABLE Albums
 (
   albumID INT AUTO_INCREMENT, albumOwner INT, name VARCHAR(30), datecreated DATE,
   PRIMARY KEY(albumID),
-  FOREIGN KEY(albumOwner) references Users(user_id) ON DELETE CASCADE
+  FOREIGN KEY(albumOwner) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Comments
@@ -77,15 +77,15 @@ CREATE TABLE Has_Comment
 CREATE TABLE Tags
 (
   tag TINYTEXT NOT NULL,
-  tagID int AUTO_INCREMENT,
+  tagID INT AUTO_INCREMENT,
   PRIMARY KEY (tagID)
 );
 
 CREATE TABLE Has_Tag
 (
-  tagID int, photoid INT,
-  PRIMARY KEY(tagID, photoID),
-  FOREIGN KEY(photoID) REFERENCES Photos(photoid) ON DELETE CASCADE,
+  tagID INT, photoid INT,
+  PRIMARY KEY(tagID, photoid),
+  FOREIGN KEY(photoid) REFERENCES Photos(photoid) ON DELETE CASCADE,
   FOREIGN KEY(tagID) REFERENCES Tags(tagID) ON DELETE CASCADE
 );
 
@@ -110,4 +110,4 @@ CREATE TABLE Likes
 INSERT INTO Users (firstname, lastname,username, email, password)
 VALUES ('Yuta', 'Takano','test2','test2@bu.edu', 'test');
 INSERT INTO Users (email, password) VALUES ('test1@bu.edu', 'test');
-INSERT INTO Users (email, password) VALUES ('test1@bu.edu', 'test');
+
