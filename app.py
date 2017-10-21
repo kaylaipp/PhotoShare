@@ -234,6 +234,24 @@ def protected():
 # photos uploaded using base64 encoding so they can be directly embeded in HTML 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
+#direct to search page w/search bar
+@app.route('/search')
+def searchpage():
+	return render_template('search.html')
+
+#when searched is pressed! ~unfinished~
+# @app.route('/search',methods=['GET','POST'])
+# @flask_login.login_required
+# def search_friends():
+# 	name=request.form.get('name')
+# 	name=name.split(' ')
+# 	first_name=name[0]
+# 	last_name=name[1]
+# 	cursor=conn.cursor()
+# 	cursor.execute("SELECT user_id, firstname, lastname "
+#                    "FROM Users WHERE firstname='{0}' AND last_name='{1}'".format(first_name,last_name))
+# 	users=cursor.fetchall()
+# 	return render_template('search.html',users=users, message="Search results")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS

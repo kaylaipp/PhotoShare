@@ -1,4 +1,4 @@
-h1{
+h1,h2,h3,h4{
     text-align: center;
 }
 .centerbuttons{
@@ -24,4 +24,16 @@ ul{
     position: relative;
     left: 35%;
     padding: 3%
+}
+
+div.col-lg-6{
+    position: relative;
+    left: 25%
+}
+
+div.nav{
+    position: relative;
+    top: 50px;
+    right: 65px;
+
 }
