@@ -226,7 +226,7 @@ def isEmailUnique(email):
 def protected():
     name = getNameFromEmail(flask_login.current_user.id)
     user = getUserIdFromEmail(flask_login.current_user.id)
-    album = getUsersAlbums(user)[2,-2]
+    album = getUsersAlbums(user)[2:-2]
     return render_template('profile.html', name=flask_login.current_user.id, firstname=name, albums=album)
 
 
