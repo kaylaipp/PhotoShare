@@ -249,7 +249,7 @@ def create_album(): #i can get new albums to be created and inserted into the Al
             albumName = request.form.get('album_title')
             date = time.strftime("%Y-%m-%d")
             cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
-            cursor.commit()
+            conn.commit()
             return render_template('new_album.html', message='Album Created!', supress = False)#albums=getUsersAlbums(uid))
         else:
             return render_template('new_album.html', message="Choose an album title", supress = True)
