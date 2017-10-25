@@ -64,7 +64,6 @@ def user_loader(email):
     user.id = email
     return user
 
-
 @login_manager.request_loader
 def request_loader(request):
     users = getUserList()
@@ -125,7 +124,7 @@ def unauthorized_handler():
 def register():
     return render_template('register.html', supress='True')
 
-
+#registering new user
 @app.route("/register", methods=['POST'])
 def register_user():
     try:
@@ -134,9 +133,8 @@ def register_user():
         firstname = request.form.get('firstname')
         lastname = request.form.get('lastname')
         username = request.form.get('username')
-        DOB = request.form.get('DOB')          # produces error for some reason :(
-                                               # works for me! try dropping your old photoshare db  -Y
-                                               # and making a whole new one with the schema code maybe?
+        DOB = request.form.get('DOB')
+
     except:
         print("couldn't find all tokens")  # this prints to shell, end users will not see this (all print statements go to shell)
         return flask.redirect(flask.url_for('register'))
@@ -155,21 +153,28 @@ def register_user():
         return render_template('profile.html', name=firstname, message='Account Created!')
     else:
         print("couldn't find all tokens")
-        #message = "email already in use!"
-        #return message
         return render_template('register.html', supress=False)
-        #return flask.redirect(flask.url_for('register'))
 
-@app.route("/view_album", methods=['POST'])
+
+@app.route('/view_album')
+def albumpageview():
+	return render_template('view_album.html')
+
+@app.route("/view_album", methods=['GET','POST'])
 def view_album():
     album = request.form.get('view_album')
     albumname = album[2:-2]
     try:
         print(album[1])
-        photos = getPhotosFromAlbum(getUserIdFromEmail(),album[1]) #how can I get the album id ???????????
+        #not sure if what i put actually works yet
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        albumid = getAlbumID(uid)
+        #photos = getPhotosFromAlbum(getUserIdFromEmail(),album[1]) #how can I get the album id ???????????
+        photos = getPhotosFromAlbum(uid, albumid)
     except:
         print("couldn't find all tokens")
-        return render_template('view_album.html', album=albumname, albumid = album[1])
+        #return render_template('view_album.html', album=albumname, albumid = album[1])
+        return render_template('view_album.html', album=albumname, albumid=albumid)
     return render_template('view_album.html', album = albumname, photos = photos, albumid = album)
 ## need to figure out how to get the album id so I can pass it into view_album which can then be passed
 ## from there into upload -- bc I want only to be able to upload from within an album
@@ -178,7 +183,9 @@ def view_album():
 
 def getUsersPhotos(uid):
     cursor = conn.cursor()
-    cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id = '{0}'".format(uid))
+    #cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id = '{0}'".format(uid))
+    cursor.execute("SELECT imgdata, photoid, caption FROM Photos WHERE user_id = '{0}'".format(uid))
+
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getPhotosFromAlbum(uid,albumid):
@@ -193,10 +200,10 @@ def getUsersAlbums(uid):
     return cursor.fetchall()
 
 
-# def getAlbumID(uid):
-#     cursor = conn.cursor()
-#     cursor.execute("SELECT albumID FROM Albums WHERE albumOwner = '{0}'".format(uid))
-#     return cursor.fetchall()
+def getAlbumID(uid):
+    cursor = conn.cursor()
+    cursor.execute("SELECT albumID FROM Albums WHERE albumOwner = '{0}'".format(uid))
+    return cursor.fetchall()
 
 
 def getUserIdFromEmail(email):
@@ -218,6 +225,14 @@ def isEmailUnique(email):
     else:
         return True
 
+#display your friends on your profile page ~not working yet~
+def displayFriends(email):
+    cusor = conn.cursor()
+    currentuser = getUserIdFromEmail(flask_login.current_user.id)
+    if cursor.execute("SELECT email  FROM Users WHERE email = '{0}'".format(email)):
+        #
+        cusor.execute("SELECT friend FROM Friends WHERE UserID1 = currentuser")
+    #return render_template('profile.html', friend = friends, message = "Your Friends")
 
 # end login code
 
@@ -239,19 +254,20 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 def searchpage():
 	return render_template('search.html')
 
-#when searched is pressed! ~unfinished~
-# @app.route('/search',methods=['GET','POST'])
-# @flask_login.login_required
-# def search_friends():
-# 	name=request.form.get('name')
-# 	name=name.split(' ')
-# 	first_name=name[0]
-# 	last_name=name[1]
-# 	cursor=conn.cursor()
-# 	cursor.execute("SELECT user_id, firstname, lastname "
-#                    "FROM Users WHERE firstname='{0}' AND last_name='{1}'".format(first_name,last_name))
-# 	users=cursor.fetchall()
-# 	return render_template('search.html',users=users, message="Search results")
+#when search button is pressed
+@app.route('/search',methods=['GET','POST'])
+@flask_login.login_required
+def search_friends():
+    #if request.form.get('name') is not None:
+        name = request.form.get('name')
+        name = name.split(' ')
+        first_name = name[0]
+        last_name = name[1]
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id, firstname, lastname "
+                       "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name))
+        users = cursor.fetchall()
+        return render_template('search.html', users=users, message="Search results")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -284,10 +300,18 @@ def upload_file():
         print(caption)
         photo_data = base64.standard_b64encode(imgfile.read())
         cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO Pictures(imgdata, user_id, caption) \
-             VALUES ('{0}', '{1}', '{2}' )".format(photo_data, uid, caption))
+        query = "INSERT INTO Photos(imgdata, user_id, caption) VALUES('{0}', '{1}', '{2}')".format(photo_data, uid, caption)
+        cursor.execute(query)
+        print(query)
+        #cursor.execute(
+            #"INSERT INTO Pictures(imgdata, user_id, caption) \
+             #VALUES ('{0}', '{1}', '{2}' )".format(photo_data, uid, caption))
             # getting a mysql syntax error when trying to upload but IDK WHY
+
+            #I think it should work now! or at least error out of the way lol
+            # used 'Photos' instead of 'Pictures' same thing in getUsersPhotos()
+            #also had to do with the variable photo_data, python 3 doesn't support it, so change interpreter to 2.7
+
         conn.commit()
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',
                                photos=getUsersPhotos(uid))
