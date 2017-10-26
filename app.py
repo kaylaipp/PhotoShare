@@ -258,16 +258,32 @@ def searchpage():
 @app.route('/search',methods=['GET','POST'])
 @flask_login.login_required
 def search_friends():
-    #if request.form.get('name') is not None:
+    try:
         name = request.form.get('name')
         name = name.split(' ')
         first_name = name[0]
         last_name = name[1]
         cursor = conn.cursor()
-        cursor.execute("SELECT user_id, firstname, lastname "
-                       "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name))
+        query = "SELECT user_id, firstname, lastname " \
+                "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
+        cursor.execute(query)
         users = cursor.fetchall()
         return render_template('search.html', users=users, message="Search results")
+    except IndexError:
+        return render_template('search.html', message="No results found, "
+                                                                   "please enter first and last"
+                                                                   "name")
+@app.route('/profile', methods=['POST'])
+@flask_login.login_required
+def addfriends():
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    cursor = conn.cursor()
+    query = "INSERT INTO Friends (userID1, userID2)" \
+            "VALUES ('{0}', '{1}')".format(uid, User)
+    cursor.execute(query)
+    conn.commit()
+    return render_template('/profile.html', message = "added friend!")
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -293,16 +309,20 @@ def create_album(): #i can get new albums to be created and inserted into the Al
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
+    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    app.config['Uploads'] = Uploads
     if request.method == 'POST':
         uid = getUserIdFromEmail(flask_login.current_user.id)
-        imgfile = request.files['photo']
+        uploadfile = request.files['photo']
         caption = request.form.get('caption')
-        print(caption)
-        photo_data = base64.standard_b64encode(imgfile.read())
+        filename = uploadfile.filename
+        print(filename)
+        #to save photos to upload folder
+        uploadfile.save(os.path.join(app.config['Uploads'], filename))
+        photo_data = base64.standard_b64encode(uploadfile.read())
         cursor = conn.cursor()
-        query = "INSERT INTO Photos(imgdata, user_id, caption) VALUES('{0}', '{1}', '{2}')".format(photo_data, uid, caption)
+        query = "INSERT INTO Photos(imgdata, user_id, caption, photopath) VALUES('{0}', '{1}', '{2}', '{3}')".format(photo_data, uid, caption, filename)
         cursor.execute(query)
-        print(query)
         #cursor.execute(
             #"INSERT INTO Pictures(imgdata, user_id, caption) \
              #VALUES ('{0}', '{1}', '{2}' )".format(photo_data, uid, caption))
@@ -319,7 +339,16 @@ def upload_file():
     else:
         return render_template('upload.html')
 
-# end photo uploading code
+#Trying to display photos on profile 
+@app.route('/profile', methods=['GET'])
+def showPhotos():
+    # get photopath from the database: SELECT photopath FROM PHOTOS WHERE USER_ID =
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    query = "SELECT photopath " \
+            "FROM Photos WHERE user_id = '{0}'".format(uid)
+    print(query)
+    photopath = query
+    return render_template('profile.html', photopath = photopath)
 
 # default page
 @app.route("/", methods=['GET'])
