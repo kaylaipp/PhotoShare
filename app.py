@@ -234,8 +234,17 @@ def displayFriends(email):
         cusor.execute("SELECT friend FROM Friends WHERE UserID1 = currentuser")
     #return render_template('profile.html', friend = friends, message = "Your Friends")
 
-# end login code
+#@app.route('/search',methods=['GET','POST'])
+#@flask_login.login_required
+def getUserId(first_name, last_name):
+    cursor = conn.cursor()
+    query = "SELECT user_id " \
+            "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
+    cursor.execute(query)
+    user_id = cursor.fetchone()
+    return user_id
 
+# end login code
 @app.route('/profile')
 @flask_login.login_required
 def protected():
@@ -263,8 +272,10 @@ def search_friends():
         name = name.split(' ')
         first_name = name[0]
         last_name = name[1]
+        uid = getUserId(first_name, last_name)
+        print(uid)
         cursor = conn.cursor()
-        query = "SELECT user_id, firstname, lastname " \
+        query  = "SELECT user_id, firstname, lastname " \
                 "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
         cursor.execute(query)
         users = cursor.fetchall()
@@ -273,6 +284,12 @@ def search_friends():
         return render_template('search.html', message="No results found, "
                                                                    "please enter first and last"
                                                                    "name")
+#when you click each user, get their info to display their profile
+#def getProfileInfo(uid):
+
+
+
+
 @app.route('/profile', methods=['POST'])
 @flask_login.login_required
 def addfriends():
@@ -339,7 +356,7 @@ def upload_file():
     else:
         return render_template('upload.html')
 
-#Trying to display photos on profile 
+#Trying to display photos on profile
 @app.route('/profile', methods=['GET'])
 def showPhotos():
     # get photopath from the database: SELECT photopath FROM PHOTOS WHERE USER_ID =
