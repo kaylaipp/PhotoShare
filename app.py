@@ -29,8 +29,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -226,12 +226,16 @@ def isEmailUnique(email):
         return True
 
 #display your friends on your profile page ~not working yet~
+
 def displayFriends(email):
-    cusor = conn.cursor()
+    cursor = conn.cursor()
     currentuser = getUserIdFromEmail(flask_login.current_user.id)
     if cursor.execute("SELECT email  FROM Users WHERE email = '{0}'".format(email)):
         #
-        cusor.execute("SELECT friend FROM Friends WHERE UserID1 = currentuser")
+        cursor.execute("SELECT S.firstname, S.lastname FROM"" \
+                        Users S LEFT JOIN Friends R \
+                        ON S.user_id = R.userID1 \
+                         WHERE R.userID1 = currentuser")
     #return render_template('profile.html', friend = friends, message = "Your Friends")
 
 #@app.route('/search',methods=['GET','POST'])
@@ -280,7 +284,7 @@ def search_friends():
         cursor.execute(query)
         users = cursor.fetchall()
         return render_template('search.html', users=users, message="Search results")
-    except IndexError:
+    except (uid == none): #I'm not getting an index error on non-existent users
         return render_template('search.html', message="No results found, "
                                                                    "please enter first and last"
                                                                    "name")
@@ -349,6 +353,9 @@ def upload_file():
             # used 'Photos' instead of 'Pictures' same thing in getUsersPhotos()
             #also had to do with the variable photo_data, python 3 doesn't support it, so change interpreter to 2.7
 
+            # does everything else work with Python 2.7? Cuz I think I remember baichuan saying something
+            # about a different skeleton code for 2.7, or just saving the picture to the static
+            # folder if we wana use 3.5
         conn.commit()
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',
                                photos=getUsersPhotos(uid))
