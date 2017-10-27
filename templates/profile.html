@@ -1,6 +1,8 @@
 <!-- author ben lawson (balawson@bu.edu) -->
 <!doctype html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <!--<link rel="stylesheet" href="https://github.com/kaylaipp/PhotoShare/blob/master/templates/pastylesheet.css">
         -->
@@ -12,7 +14,6 @@
 
 <title>Welcome To Your Profile</title>
 <h1>Welcome To Your Profile, {{ firstname }}!</h1>
-
 
 {% if message  %}
   <p>{{ message }}</p>
@@ -33,13 +34,19 @@
     </ul>
 {%  endif  %}
 
+{% if photopath %}
+    {# causing photos not to appear for some reason?  #}
+      <img src={{ photopath }}>
+    {# for testing, but following line also doens't work  #}
+{#     <img src="../uploads/img2.png"> #}
+{% endif %}
+
 {% if photos %}
 <h2>Your photos</h2>
     <ul>
     {% for photo in photos %}
-
         <li>{{photo[2]}}<br>
-        <img src='data:image/png;base64, {{photo[0]}}'/></li>
+        <img src='data:image/png;base64,{photo[0]}}'/></li>
     {% endfor %}
     </ul>
 {% endif %}
@@ -48,13 +55,15 @@
   <p>You should <a href='/login'>login!</a></p>
 {% endif %}
 
-
+<div class = 'profilenav'>
     <ul>
-        <li><a href='/new_album'>Create new album</a></li>
-        <li><a href='/view_album'>View albums</a></li>
-        <li><a href='/upload'>Upload a photo</a> </li>
-        <li><a href='/search'>Search For Friends</a> </li>
-        <li><a href='/logout'>Logout</a>
-        <li><a href='/'>Home</a></li>
+    <li><a href='/new_album'>Create new album</a></li>
+    <li><a href='/view_album'>View albums</a></li>
+    <li><a href='/upload'>Upload a photo</a></li>
+    <li><a href='/search'>Search For Friends</a></li>
+    <li><a href='/logout'>Logout</a></li>
+    <li><a href='/'>Home</a></li>
     </ul>
+</div>
+
 </body>
