@@ -284,7 +284,7 @@ def search_friends():
         cursor.execute(query)
         users = cursor.fetchall()
         return render_template('search.html', users=users, message="Search results")
-    except (uid == none): #I'm not getting an index error on non-existent users
+    except (uid == None): #I'm not getting an index error on non-existent users
         return render_template('search.html', message="No results found, "
                                                                    "please enter first and last"
                                                                    "name")
