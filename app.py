@@ -27,10 +27,10 @@ mysql = MySQL()
 app = Flask(__name__)
 app.secret_key = 'super secret string'  # Change this!
 
-# These will need to be changed according to your creditionals
+# These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -161,7 +161,8 @@ def listalbums():
     albumnames = "SELECT name " \
                  "FROM Albums WHERE albumOwner = '{0}'".format(uid)
     albumnames = cursor.execute(albumnames)
-    albumnames = cursor.fetchall()
+    #albumnames = cursor.fetchall()
+    cursor.fetchall()
     #for name in albumnames:
         #name.encode('ascii', 'ignore')
     return albumnames
@@ -252,13 +253,17 @@ def displayFriends(uid):
 def friendcount(uid):
     cursor = conn.cursor()
     print(uid)
-    count = "SELECT count(distinct(userID1 + userID2))" \
+    #count = "SELECT count(distinct(userID1 + userID2))" \
+    #       "FROM Friends " \
+    #       "WHERE userID1 OR userID2 = '{0}'".format(uid)
+
+    count = "SELECT count(distinct(userID2))" \
             "FROM Friends " \
-            "WHERE userID1 OR userID2 = '{0}'".format(uid)
+            "WHERE userID1 = '{0}'".format(uid)
     cursor.execute(count)
     count = cursor.fetchall()
-    print('count: ', count)
-    return count
+    print('count: ', str(count))
+    return str(count)[2:-4] #this was giving me count:  ((1,),) so i converted to string and sliced it
 
 #@app.route('/search',methods=['GET','POST'])
 #@flask_login.login_required
@@ -391,7 +396,7 @@ def allowed_file(filename):
 
 @app.route('/new_album', methods=['GET', 'POST'])
 @flask_login.login_required
-def create_album(): #i can get new albums to be created and inserted into the Albums table in the DB
+def create_album():
     if request.method == 'POST':
         if (True):
             cursor = conn.cursor()
@@ -410,6 +415,7 @@ def create_album(): #i can get new albums to be created and inserted into the Al
 @flask_login.login_required
 def upload_file():
     Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads'
     app.config['Uploads'] = Uploads
     if request.method == 'POST':
         uid = getUserIdFromEmail(flask_login.current_user.id)
