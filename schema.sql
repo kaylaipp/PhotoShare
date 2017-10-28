@@ -12,6 +12,13 @@ CREATE TABLE Users (
   CONSTRAINT users_pk PRIMARY KEY (user_id)
 );
 
+CREATE TABLE Albums
+(
+  albumID INT AUTO_INCREMENT, albumOwner INT, name VARCHAR(30), datecreated DATE,
+  PRIMARY KEY(albumID),
+  FOREIGN KEY(albumOwner) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
 CREATE TABLE Photos
 (
   photoid INT AUTO_INCREMENT,
@@ -41,7 +48,6 @@ CREATE TRIGGER owns_albums
     INSERT INTO Owns_Albums(user_id, album_id) VALUES(:new.albumOwner,:new.albumID);
   END;
 
-
 CREATE TABLE Belongs_To
 (
   photoID INT, albumID INT NOT NULL,
@@ -50,12 +56,6 @@ CREATE TABLE Belongs_To
   FOREIGN KEY(albumID) REFERENCES Albums(albumID) ON DELETE CASCADE
 );
 
-CREATE TABLE Albums
-(
-  albumID INT AUTO_INCREMENT, albumOwner INT, name VARCHAR(30), datecreated DATE,
-  PRIMARY KEY(albumID),
-  FOREIGN KEY(albumOwner) REFERENCES Users(user_id) ON DELETE CASCADE
-);
 
 CREATE TABLE Comments
 (
@@ -94,9 +94,10 @@ CREATE TABLE Friends
 (
   userID1 INT NOT NULL AUTO_INCREMENT,
   userID2 INT NOT NULL,
-  CONSTRAINT friends_pk PRIMARY KEY (user_1, user_2));
-  #FOREIGN KEY(userID1) REFERENCES USERS(user_id) ON DELETE CASCADE,
-  #FOREIGN KEY(userID2) REFERENCES USERS(user_id) ON DELETE CASCADE
+  CONSTRAINT friends_pk PRIMARY KEY (userID1, userID2),
+  FOREIGN KEY (userID1) REFERENCES USERS(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (userID2) REFERENCES USERS (user_id)ON DELETE CASCADE
+);
 
 
 CREATE TABLE Likes
