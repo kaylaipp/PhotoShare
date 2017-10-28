@@ -29,8 +29,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your creditionals
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -145,7 +145,6 @@ def register_user():
                              "VALUES ('{0}', '{1}','{2}', '{3}','{4}', '{5}')".format(email, password,
                               firstname, lastname,username,DOB)))
         conn.commit()
-
         # log user in
         user = User()
         user.id = email
@@ -155,6 +154,14 @@ def register_user():
         print("couldn't find all tokens")
         return render_template('register.html', supress=False)
 
+#to list names of albums on user profile page
+def listalbums():
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    cursor = conn.cursor()
+    albumnames = "SELECT name " \
+                 "FROM Albums WHERE albumOwner = '{0}'".format(uid)
+    albumnames = cursor.execute(albumnames)
+    return cursor.fetchall()
 
 @app.route('/view_album')
 def albumpageview():
@@ -185,12 +192,13 @@ def getUsersPhotos(uid):
     cursor = conn.cursor()
     #cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id = '{0}'".format(uid))
     cursor.execute("SELECT imgdata, photoid, caption FROM Photos WHERE user_id = '{0}'".format(uid))
-
+    photos = cursor.fetchall()
+    print(photos)
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getPhotosFromAlbum(uid,albumid):
     cursor = conn.cursor()
-    cursor.execute("SELECT imgdata, picture_id, caption FROM Photos \
+    cursor.execute("SELECT imgdata, photo_id, caption FROM Photos \
                     WHERE Photos.user_id = '{0}' AND Photos.album_id = '{1}'".format(uid,albumid))
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
@@ -226,16 +234,12 @@ def isEmailUnique(email):
         return True
 
 #display your friends on your profile page ~not working yet~
-
 def displayFriends(email):
-    cursor = conn.cursor()
+    cusor = conn.cursor()
     currentuser = getUserIdFromEmail(flask_login.current_user.id)
     if cursor.execute("SELECT email  FROM Users WHERE email = '{0}'".format(email)):
         #
-        cursor.execute("SELECT S.firstname, S.lastname FROM"" \
-                        Users S LEFT JOIN Friends R \
-                        ON S.user_id = R.userID1 \
-                         WHERE R.userID1 = currentuser")
+        cusor.execute("SELECT friend FROM Friends WHERE UserID1 = currentuser")
     #return render_template('profile.html', friend = friends, message = "Your Friends")
 
 #@app.route('/search',methods=['GET','POST'])
@@ -245,21 +249,26 @@ def getUserId(first_name, last_name):
     query = "SELECT user_id " \
             "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
     cursor.execute(query)
-    user_id = cursor.fetchone()
+    user_id = cursor.fetchone()[0]
     return user_id
 
 # end login code
+#display current user profile
 @app.route('/profile')
 @flask_login.login_required
 def protected():
     name = getNameFromEmail(flask_login.current_user.id)
     user = getUserIdFromEmail(flask_login.current_user.id)
     album = getUsersAlbums(user)[2:-2]
-    return render_template('profile.html', name=flask_login.current_user.id, firstname=name, albums=album)
-
+    uid = getNameFromEmail(flask_login.current_user.id)
+    #photos = getUsersPhotos(user)
+    #photopath = showPhotos(user)
+    photopath = showPhotos()
+    albumnames = listalbums()
+    return render_template('profile.html', name=flask_login.current_user.id, firstname=name, albumname = albumnames, albums=album, photopath = photopath)
 
 # begin photo uploading code
-# photos uploaded using base64 encoding so they can be directly embeded in HTML 
+# photos uploaded using base64 encoding so they can be directly embeded in HTML
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 #direct to search page w/search bar
@@ -283,16 +292,58 @@ def search_friends():
                 "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
         cursor.execute(query)
         users = cursor.fetchall()
-        return render_template('search.html', users=users, message="Search results")
-    except (uid == None): #I'm not getting an index error on non-existent users
+        info = getProfileInfo(uid)
+        return render_template('search.html', users=users, message="User search results")
+    except IndexError:
         return render_template('search.html', message="No results found, "
                                                                    "please enter first and last"
                                                                    "name")
+#Should return USERS that created comments that match search
+#return users ordered by number of comments
+#that match the query for each user in descending order
+# @app.route('/search',methods=['GET','POST'])
+# @flask_login.login_required
+# def search_comments():
+#     comments = request.form.get('comments')
+#     comments = comments.split(' ')
+#     cursor = conn.cursor()
+#     search = " "
+#     for word in comments:
+#         user = "SELECT userID" \
+#                "FROM Comments " \
+#                "WHERE text = '{0}'".format(word)
+#         search += user
+#         print(search)
+#     result = cursor.execute(search)
+#     result = cursor.fetchall()
+#     return render_template('search.html', users = result, message="Comment search results:")
+
 #when you click each user, get their info to display their profile
-#def getProfileInfo(uid):
+#display info such as: their name, photos, if you are friends or not
+@app.route('/friendprofile')
+def friendprofilepage():
+	return render_template('friendprofile.html')
 
-
-
+@app.route('/friendprofile', methods=['GET','POST'])
+def getProfileInfo(uid):
+    cursor = conn.cursor()
+    #get first name
+    firstname = "SELECT firstname "\
+            "FROM USERS " \
+            "WHERE user_id ='{0}'".format(uid)
+    cursor.execute(firstname)
+    firstname = cursor.fetchone()[0]
+    print(firstname)
+    #get lastname
+    lastname = "SELECT lastname " \
+                "FROM USERS " \
+                "WHERE user_id ='{0}'".format(uid)
+    cursor.execute(lastname)
+    lastname = cursor.fetchone()[0]
+    print(lastname)
+    #get user photos
+    photos = getUsersPhotos(uid)
+    return render_template('friendprofile.html', firstname='firstname', lastname='lastname', photo=photos)
 
 @app.route('/profile', methods=['POST'])
 @flask_login.login_required
@@ -304,7 +355,6 @@ def addfriends():
     cursor.execute(query)
     conn.commit()
     return render_template('/profile.html', message = "added friend!")
-
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -330,17 +380,20 @@ def create_album(): #i can get new albums to be created and inserted into the Al
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
     app.config['Uploads'] = Uploads
     if request.method == 'POST':
         uid = getUserIdFromEmail(flask_login.current_user.id)
         uploadfile = request.files['photo']
         caption = request.form.get('caption')
-        filename = uploadfile.filename
-        print(filename)
+        album_id = request.form.get('album_id')
+        filename = "../uploads/" + uploadfile.filename            #img1.png, img2.png
+        cursor = conn.cursor()
+
         #to save photos to upload folder
         uploadfile.save(os.path.join(app.config['Uploads'], filename))
         photo_data = base64.standard_b64encode(uploadfile.read())
+        print(photo_data)                       #blank for some reason
         cursor = conn.cursor()
         query = "INSERT INTO Photos(imgdata, user_id, caption, photopath) VALUES('{0}', '{1}', '{2}', '{3}')".format(photo_data, uid, caption, filename)
         cursor.execute(query)
@@ -353,9 +406,6 @@ def upload_file():
             # used 'Photos' instead of 'Pictures' same thing in getUsersPhotos()
             #also had to do with the variable photo_data, python 3 doesn't support it, so change interpreter to 2.7
 
-            # does everything else work with Python 2.7? Cuz I think I remember baichuan saying something
-            # about a different skeleton code for 2.7, or just saving the picture to the static
-            # folder if we wana use 3.5
         conn.commit()
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',
                                photos=getUsersPhotos(uid))
@@ -364,21 +414,21 @@ def upload_file():
         return render_template('upload.html')
 
 #Trying to display photos on profile
+#not completely working yet, getting blue boxes
 @app.route('/profile', methods=['GET'])
 def showPhotos():
-    # get photopath from the database: SELECT photopath FROM PHOTOS WHERE USER_ID =
     uid = getUserIdFromEmail(flask_login.current_user.id)
     query = "SELECT photopath " \
             "FROM Photos WHERE user_id = '{0}'".format(uid)
-    print(query)
-    photopath = query
-    return render_template('profile.html', photopath = photopath)
+    cursor.execute(query)
+    #photopath = cursor.fetchall()
+    #print('photopath: ',photopath)
+    return render_template('profile.html', photopath = "../uploads/img1.png")
 
 # default page
 @app.route("/", methods=['GET'])
 def hello():
     return render_template('hello.html', message='Welcome to Photoshare')
-
 
 if __name__ == "__main__":
     # this is invoked when in the shell  you run
