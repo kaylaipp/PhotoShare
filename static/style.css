@@ -1,4 +1,4 @@
-h1,h2,h3,h4{
+h1,h2,h3,h4,h5{
     text-align: center;
 }
 .centerbuttons{
@@ -23,7 +23,11 @@ body {
 ul{
     position: relative;
     left: 35%;
-    padding: 3%
+    padding: 3%;
+}
+li{
+    text-align: center;
+    list-style-type: none;
 }
 
 div.col-lg-6{
@@ -33,7 +37,17 @@ div.col-lg-6{
 
 div.nav{
     position: relative;
-    top: 50px;
-    right: 65px;
+    top: 0px;
+    right: 5px;
+}
 
+div.profilenav{
+    position: relative;
+    right: 35%;
+}
+
+div.albums{
+    position: relative;
+    right: 35%;
+    text-align: center;
 }

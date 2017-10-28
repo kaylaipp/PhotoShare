@@ -19,6 +19,7 @@ CREATE TABLE Photos
   album_id INT,
   imgdata LONGBLOB ,
   caption VARCHAR(255),
+  photopath VARCHAR(100),
   INDEX upid_idx (user_id),
   CONSTRAINT pictures_pk PRIMARY KEY (photoid),
   FOREIGN KEY(user_id) REFERENCES Users(user_id) ON DELETE CASCADE,

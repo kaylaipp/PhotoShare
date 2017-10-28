@@ -292,7 +292,7 @@ def search_friends():
                 "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
         cursor.execute(query)
         users = cursor.fetchall()
-        info = getProfileInfo(uid)
+        #info = getProfileInfo(uid)
         return render_template('search.html', users=users, message="User search results")
     except IndexError:
         return render_template('search.html', message="No results found, "
@@ -320,41 +320,43 @@ def search_friends():
 
 #when you click each user, get their info to display their profile
 #display info such as: their name, photos, if you are friends or not
-@app.route('/friendprofile')
-def friendprofilepage():
-	return render_template('friendprofile.html')
+# @app.route('/friendprofile')
+# def friendprofilepage():
+# 	return render_template('friendprofile.html')
 
-@app.route('/friendprofile', methods=['GET','POST'])
-def getProfileInfo(uid):
-    cursor = conn.cursor()
-    #get first name
-    firstname = "SELECT firstname "\
-            "FROM USERS " \
-            "WHERE user_id ='{0}'".format(uid)
-    cursor.execute(firstname)
-    firstname = cursor.fetchone()[0]
-    print(firstname)
-    #get lastname
-    lastname = "SELECT lastname " \
-                "FROM USERS " \
-                "WHERE user_id ='{0}'".format(uid)
-    cursor.execute(lastname)
-    lastname = cursor.fetchone()[0]
-    print(lastname)
-    #get user photos
-    photos = getUsersPhotos(uid)
-    return render_template('friendprofile.html', firstname='firstname', lastname='lastname', photo=photos)
+# @app.route('/friendprofile', methods=['GET','POST'])
+# def getProfileInfo(uid):
+#     cursor = conn.cursor()
+#     #get first name
+#     firstname = "SELECT firstname "\
+#             "FROM USERS " \
+#             "WHERE user_id ='{0}'".format(uid)
+#     cursor.execute(firstname)
+#     firstname = cursor.fetchone()[0]
+#     print(firstname)
+#     #get lastname
+#     lastname = "SELECT lastname " \
+#                 "FROM USERS " \
+#                 "WHERE user_id ='{0}'".format(uid)
+#     cursor.execute(lastname)
+#     lastname = cursor.fetchone()[0]
+#     print(lastname)
+#     #get user photos
+#     photos = getUsersPhotos(uid)
+#     return render_template('friendprofile.html', firstname='firstname', lastname='lastname', photo=photos)
 
-@app.route('/profile', methods=['POST'])
+@app.route('/search/<user>', methods=['GET'])
 @flask_login.login_required
-def addfriends():
+def addfriends(user):
     uid = getUserIdFromEmail(flask_login.current_user.id)
+    print('user uid: ', uid)
+    print('friend uid: ', user )
     cursor = conn.cursor()
     query = "INSERT INTO Friends (userID1, userID2)" \
             "VALUES ('{0}', '{1}')".format(uid, User)
     cursor.execute(query)
     conn.commit()
-    return render_template('/profile.html', message = "added friend!")
+    return render_template('/hello.html', message = "added friend!")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS

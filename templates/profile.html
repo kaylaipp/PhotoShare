@@ -32,7 +32,9 @@
 {#        </div>#}
 {#        <li><a href="/open/{{album[1]}}">{{album[1]}}</a><br>#}
 {#	    </li>#}
-        <li>{{ album }}</li>
+{#        <li><{{ album }}</li>#}
+
+            <li><a href="/view_album"> {{ album }} </a></li>
     {% endfor %}
     </ul>
     </div>

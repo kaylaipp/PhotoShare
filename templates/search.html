@@ -6,12 +6,17 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </head>
+    <div class = 'nav'>
+        <li><a href='/profile'>Home</a></li>
+    </div>
+
 <meta charset="UTF-8">
     <title>Search</title>
 
 <body>
     <h3>Search</h3>
     <h4>search for users and friends</h4>
+    <h5>click user to add as friend</h5>
     <div class = "searchbar">
       <form action="/search" method = "post">
         <div class="input-group">
@@ -29,7 +34,7 @@
     {% if users %}
         {% for user in users %}
         <!--<li><a href="/friendprofile/{{user[0]}}"> {{user[1] + ' ' + user[2]}} </a></li>-->
-            <li><a href="/friendprofile"> {{user[1] + ' ' + user[2]}} </a></li>
+            <li><a href="/hello"> {{user[1] + ' ' + user[2]}} </a></li>
         {% endfor %}
     {% endif %}
 
@@ -39,10 +44,8 @@
         {% endfor %}
     {% endif %}
 
-    <div class="nav">
-        <a href='/'>Home</a>
-        <a href='/profile'>Profile</a>
-        <a href='/logout'>Logout</a>
-    </div>
+
+
+
 </body>
 
