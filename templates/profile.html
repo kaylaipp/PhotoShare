@@ -21,17 +21,21 @@
 
 {%  if albums %}
 <h2>Your Albums</h2>
+    <div class = "albums">
     <ul>
-    {% for album in albums %}
-
-        <div id="select_album">
-            <form method="post" action="{{ url_for('view_album') }}">
-                <input type="submit" value = {{ album }} name="view_album"/><br/>
-            </form>
-        </div>
-
+{#    {% for album in albums %}#}
+        {% for album in albumname %}
+{#        <div id="select_album">#}
+{#            <form method="post" action="{{ url_for('view_album') }}">#}
+{#                <input type="submit" value = {{ album }} name="view_album"/><br/>#}
+{#            </form>#}
+{#        </div>#}
+{#        <li><a href="/open/{{album[1]}}">{{album[1]}}</a><br>#}
+{#	    </li>#}
+        <li>{{ album }}</li>
     {% endfor %}
     </ul>
+    </div>
 {%  endif  %}
 
 {% if photopath %}
@@ -45,8 +49,8 @@
 <h2>Your photos</h2>
     <ul>
     {% for photo in photos %}
-        <li>{{photo[2]}}<br>
-        <img src='data:image/png;base64,{photo[0]}}'/></li>
+{#        <li>{{photo[2]}}<br>#}
+        <li><img src='data:image/png;base64, {{photo[0]}}'/></li>
     {% endfor %}
     </ul>
 {% endif %}
