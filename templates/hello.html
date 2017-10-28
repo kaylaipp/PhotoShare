@@ -10,7 +10,16 @@
 
     {% if uid and password %}
     <meta http-equiv="refresh" content=0; href='/profile' />
-    {% endif %}
+        {%  if friends %}
+        <h2>Your Friends</h2>
+            <ul>
+                {% for friend in friends %}
+            </ul>
+                {% endfor %}
+        {%  endif  %}
+{% endif %}
+
+
 </head>
 <title> Photoshare</title>
 <!--{% if message %}

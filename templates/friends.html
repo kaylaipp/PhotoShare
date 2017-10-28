@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Friends</title>
+</head>
+<body>
+    <div class = 'nav'>
+        <li><a href='/profile'>Home</a></li>
+    </div>
+{%  if friends %}
+<h2>Your Friends</h2>
+    <div class = "friends">
+    <ul>
+        {% for friend in friends %}
+{#            <li><a href="/view_album"> {{ album }} </a></li>#}
+            <li>{{ friend }} </li>
+    {% endfor %}
+    </ul>
+    </div>
+{%  endif  %}
+</body>
+</html>

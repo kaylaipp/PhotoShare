@@ -241,17 +241,16 @@ def isEmailUnique(email):
         return True
 
 #display your friends on your profile page ~not working yet~
-@app.route('/friendlist', methods=['GET'])
-def displayFriends(uid):
+@app.route('/friends', methods=['GET'])
+def displayFriends():
     cursor = conn.cursor()
-    friends = "SELECT u.firstname, u.lastname " \
-              "FROM Users u, Friends f,  " \
-              "WHERE f.userID1 = '{0}' "\
-              "AND f.userID2 = u.user_id OR f.userID2 = '{0}'" \
-              "AND f.userID1 = u.user_id".format(uid)
-    cursor.execute(friends)
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    query = "SELECT U.firstname,U.lastname from Users U, Friends F where F.userID1='{0}' AND F.userID2=U.user_id OR F.userID2='{0}' AND F.userID1=U.user_id".format(
+            uid)
+    cursor.execute(query)
     friends = cursor.fetchall()
-    return render_template('profile.html', friends = friends, message = "Your Friends")
+    print('friends: ', friends)
+    return render_template('friends.html', friends = friends, message = "Your Friends")
 
 def friendcount(uid):
     cursor = conn.cursor()

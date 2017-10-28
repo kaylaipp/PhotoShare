@@ -23,17 +23,7 @@
 <h2>Your Albums</h2>
     <div class = "albums">
     <ul>
-{#    {% for album in albums %}#}
         {% for album in albumname %}
-{#        <div id="select_album">#}
-{#            <form method="post" action="{{ url_for('view_album') }}">#}
-{#                <input type="submit" value = {{ album }} name="view_album"/><br/>#}
-{#            </form>#}
-{#        </div>#}
-{#        <li><a href="/open/{{album[1]}}">{{album[1]}}</a><br>#}
-{#	    </li>#}
-{#        <li><{{ album }}</li>#}
-
             <li><a href="/view_album"> {{ album }} </a></li>
     {% endfor %}
     </ul>
@@ -41,7 +31,8 @@
 {%  endif  %}
 
 {% if numberfriends %}
-    <li><a href="/allfriends"> {{ numberfriends }} </a>friends</li>
+{#    <li><a href="/allfriends"> {{ numberfriends }} </a>friends</li>#}
+    <li><a href="/friends"> {{ numberfriends }} </a>friends</li>
 {% endif %}
 
 
