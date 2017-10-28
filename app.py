@@ -29,8 +29,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -161,11 +161,14 @@ def listalbums():
     albumnames = "SELECT name " \
                  "FROM Albums WHERE albumOwner = '{0}'".format(uid)
     albumnames = cursor.execute(albumnames)
-    #albumnames = cursor.fetchall()
-    cursor.fetchall()
-    #for name in albumnames:
-        #name.encode('ascii', 'ignore')
-    return albumnames
+    albumnames = cursor.fetchall()
+    #cursor.fetchall()
+    converted = []
+    for name in albumnames:
+        name = str(name)
+        converted.append(name[3:-3])
+    #return albumnames
+    return converted
 
 @app.route('/view_album')
 def albumpageview():
