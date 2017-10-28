@@ -161,7 +161,10 @@ def listalbums():
     albumnames = "SELECT name " \
                  "FROM Albums WHERE albumOwner = '{0}'".format(uid)
     albumnames = cursor.execute(albumnames)
-    return cursor.fetchall()
+    albumnames = cursor.fetchall()
+    #for name in albumnames:
+        #name.encode('ascii', 'ignore')
+    return albumnames
 
 @app.route('/view_album')
 def albumpageview():
@@ -234,13 +237,28 @@ def isEmailUnique(email):
         return True
 
 #display your friends on your profile page ~not working yet~
-def displayFriends(email):
-    cusor = conn.cursor()
-    currentuser = getUserIdFromEmail(flask_login.current_user.id)
-    if cursor.execute("SELECT email  FROM Users WHERE email = '{0}'".format(email)):
-        #
-        cusor.execute("SELECT friend FROM Friends WHERE UserID1 = currentuser")
-    #return render_template('profile.html', friend = friends, message = "Your Friends")
+@app.route('/friendlist', methods=['GET'])
+def displayFriends(uid):
+    cursor = conn.cursor()
+    friends = "SELECT u.firstname, u.lastname " \
+              "FROM Users u, Friends f,  " \
+              "WHERE f.userID1 = '{0}' "\
+              "AND f.userID2 = u.user_id OR f.userID2 = '{0}'" \
+              "AND f.userID1 = u.user_id".format(uid)
+    cursor.execute(friends)
+    friends = cursor.fetchall()
+    return render_template('profile.html', friends = friends, message = "Your Friends")
+
+def friendcount(uid):
+    cursor = conn.cursor()
+    print(uid)
+    count = "SELECT count(distinct(userID1 + userID2))" \
+            "FROM Friends " \
+            "WHERE userID1 OR userID2 = '{0}'".format(uid)
+    cursor.execute(count)
+    count = cursor.fetchall()
+    print('count: ', count)
+    return count
 
 #@app.route('/search',methods=['GET','POST'])
 #@flask_login.login_required
@@ -248,6 +266,7 @@ def getUserId(first_name, last_name):
     cursor = conn.cursor()
     query = "SELECT user_id " \
             "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
+
     cursor.execute(query)
     user_id = cursor.fetchone()[0]
     return user_id
@@ -265,7 +284,10 @@ def protected():
     #photopath = showPhotos(user)
     photopath = showPhotos()
     albumnames = listalbums()
-    return render_template('profile.html', name=flask_login.current_user.id, firstname=name, albumname = albumnames, albums=album, photopath = photopath)
+    numberfriends = friendcount(user)
+    return render_template('profile.html', name=flask_login.current_user.id,
+                           firstname=name, albumname = albumnames, albums=album,
+                           photopath = photopath, numberfriends = numberfriends)
 
 # begin photo uploading code
 # photos uploaded using base64 encoding so they can be directly embeded in HTML
@@ -286,7 +308,7 @@ def search_friends():
         first_name = name[0]
         last_name = name[1]
         uid = getUserId(first_name, last_name)
-        print(uid)
+        #print(uid)
         cursor = conn.cursor()
         query  = "SELECT user_id, firstname, lastname " \
                 "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
@@ -345,18 +367,24 @@ def search_friends():
 #     photos = getUsersPhotos(uid)
 #     return render_template('friendprofile.html', firstname='firstname', lastname='lastname', photo=photos)
 
-@app.route('/search/<user>', methods=['GET'])
-@flask_login.login_required
+#Works!
+#After searching for users, clicking on a user will add you as a friend
+@app.route('/addfriend/<user>', methods=['GET'])
+#@flask_login.login_required
 def addfriends(user):
-    uid = getUserIdFromEmail(flask_login.current_user.id)
-    print('user uid: ', uid)
-    print('friend uid: ', user )
-    cursor = conn.cursor()
-    query = "INSERT INTO Friends (userID1, userID2)" \
-            "VALUES ('{0}', '{1}')".format(uid, User)
-    cursor.execute(query)
-    conn.commit()
-    return render_template('/hello.html', message = "added friend!")
+    try:
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        print('user uid: ', uid)
+        print('friend uid: ', user )
+        user = int(user)
+        cursor = conn.cursor()
+        query = "INSERT INTO Friends (userID1, userID2)" \
+                "VALUES ('{0}', '{1}')".format(uid, user)
+        cursor.execute(query)
+        conn.commit()
+        return render_template('/search.html', message = "added friend!")
+    except:
+        return render_template('/search.html', message="you're already friends with this user!")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -365,7 +393,6 @@ def allowed_file(filename):
 @flask_login.login_required
 def create_album(): #i can get new albums to be created and inserted into the Albums table in the DB
     if request.method == 'POST':
-
         if (True):
             cursor = conn.cursor()
             uid = getUserIdFromEmail(flask_login.current_user.id)
