@@ -148,13 +148,25 @@ def register_user():
         user = User()
         user.id = email
         flask_login.login_user(user)
+
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        date = time.strftime("%Y-%m-%d")
+        createUnsorted(uid, date)
+
         return render_template('profile.html', name=firstname, message='Account Created!')
     else:
         print("couldn't find all tokens")
         return render_template('register.html', supress=False)
 
-#to list names of albums on user profile page
 
+def createUnsorted(uid, date):
+    cursor = conn.cursor()
+    unsorted = "INSERT INTO Albums(albumID, albumOwner, name, datecreated) VALUES(1, '{0}', 'Unsorted', '{1}')".format(uid, date)
+    cursor.execute(unsorted)
+    conn.commit()
+
+
+# to list names of albums on user profile page
 def listalbums(uid):
 
     cursor = conn.cursor()
@@ -209,9 +221,7 @@ def view_album():
             #return render_template('view_album.html', album=albumname, albumid = album[1])
             return render_template('view_album.html', album=album, albumid=albumid)
         return render_template('view_album.html', album = album, photos = photos, albumid = album)
-## need to figure out how to get the album id so I can pass it into view_album which can then be passed
-## from there into upload -- bc I want only to be able to upload from within an album
-## UNLESS it's easier to do a general upload and have the user select which album to upload into?
+
 
 
 def getUsersPhotos(uid):
@@ -497,8 +507,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
-    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/uploads'
+    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/uploads'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -508,7 +518,7 @@ def upload_file():
         caption = request.form.get('caption')
         album_id = getAlbumID(uid,request.form.get('album'))
         tags = request.form.get('tags').rstrip(',').split(',')
-        filename = "../uploads/" + uploadfile.filename
+        filename = Uploads + uploadfile.filename
         cursor = conn.cursor()
 
         print('upload photo path/filename: ',filename)
