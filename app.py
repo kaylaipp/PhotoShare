@@ -89,7 +89,7 @@ def new_page_function():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if flask.request.method == 'GET':
-        return render_template('login.html', suppress = True)
+        return render_template('login.html')
     # The request method is POST (page is recieving data)
     email = flask.request.form['email']
     cursor = conn.cursor()
@@ -104,7 +104,8 @@ def login():
             return flask.redirect(flask.url_for('protected'))  # protected is a function defined in this file
 
     # information did not match
-    return render_template('login.html', suppress=False)
+    return "<a href='/login'>Try again</a>\
+			</br><a href='/register'>or make an account</a>"
 
 
 @app.route('/logout')
@@ -145,44 +146,20 @@ def register_user():
                               firstname, lastname,username,DOB)))
         conn.commit()
         # log user in
-
         user = User()
         user.id = email
         flask_login.login_user(user)
-
-        # Create unsorted album for photos not yet belonging to an album
-        albumOwner = getUserIdFromEmail(flask_login.current_user.id)
-        name = "unsorted"
-        date = time.strftime("%Y-%m-%d")
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO Albums (albumOwner, name, datecreated,albumID)"
-                       "VALUES ('{0}', '{1}','{2}',1)".format(albumOwner, name, date))
-        conn.commit()
-        return flask.redirect(flask.url_for('protected'))
-
+        return render_template('profile.html', name=firstname, message='Account Created!')
     else:
         print("couldn't find all tokens")
         return render_template('register.html', supress=False)
 
 #to list names of albums on user profile page
-def listalbums(uid):
-
+def listalbums():
+    uid = getUserIdFromEmail(flask_login.current_user.id)
     cursor = conn.cursor()
-    unsorted_count = "SELECT COUNT(photoid) FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
-    unsorted_count = cursor.execute(unsorted_count)
-
-
-    if (unsorted_count <= 1):
-        albumnames = "SELECT name " \
-                 "FROM Albums " \
-                 "WHERE  name != 'unsorted' AND "\
-                 "albumOwner = '{0}'".format(uid)
-    else:
-        albumnames = "SELECT name " \
-                     "FROM Albums " \
-                     "WHERE  "\
-                     "albumOwner = '{0}'".format(uid) #
-    cursor = conn.cursor()
+    albumnames = "SELECT name " \
+                 "FROM Albums WHERE albumOwner = '{0}'".format(uid)
     albumnames = cursor.execute(albumnames)
     albumnames = cursor.fetchall()
     #cursor.fetchall()
@@ -270,17 +247,13 @@ def isEmailUnique(email):
     else:
         return True
 
-def isAlbumNameUnique(name):
-    #use this to check if an album is unique to the user
-    user = getUserIdFromEmail(flask_login.current_user.id)
+def getUsersFriends(uid):
     cursor = conn.cursor()
-    if cursor.execute("SELECT S.name FROM Albums S   WHERE S.albumOwner = user AND name = '{0}'".format(email)):
-        # this means there are greater than zero entries with that name
-        return False
-    else:
-        return True
+    cursor.execute("SELECT user_id2 FROM Friends_with WHERE user_id1 = '{0}'".format(uid))
+    return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
-#display your friends on your profile page ~not working yet~
+
+#display your friends on your profile page
 @app.route('/friends', methods=['GET'])
 def displayFriends():
     cursor = conn.cursor()
@@ -329,7 +302,7 @@ def protected():
     uid = getNameFromEmail(flask_login.current_user.id)
     photos = getUsersPhotos(user)
     photopath = showPhotos()
-    albumnames = listalbums(user)
+    albumnames = listalbums()
     numberfriends = friendcount(user)
     return render_template('profile.html', name=flask_login.current_user.id,
                            firstname=name, albumname = albumnames,
@@ -341,11 +314,15 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 #direct to search page w/search bar
 @app.route('/search')
+@flask_login.login_required
 def searchpage():
-	return render_template('search.html')
+    #friendrecs = friend_recommendations()
+    #return render_template('search.html', friendrecs = friendrecs)
+    return render_template('search.html')
 
 #when search button is pressed
 @app.route('/search',methods=['GET','POST'])
+#@app.route('/search')
 @flask_login.login_required
 def search_friends():
     try:
@@ -360,6 +337,7 @@ def search_friends():
                 "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
         cursor.execute(query)
         users = cursor.fetchall()
+        print(users)
         #info = getProfileInfo(uid)
         return render_template('search.html', users=users, message="User search results")
     except IndexError:
@@ -457,20 +435,39 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/uploads'
+    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
+    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/uploads'
     app.config['Uploads'] = Uploads
     if request.method == 'POST':
         uid = getUserIdFromEmail(flask_login.current_user.id)
         uploadfile = request.files['photo']
         caption = request.form.get('caption')
         album_id = getAlbumID(uid,request.form.get('album'))
-        filename = "../uploads/" + uploadfile.filename            #img1.png, img2.png
+        tags = request.form.get('tags').rstrip(',').split(',')
+        filename = "../uploads/" + uploadfile.filename
         cursor = conn.cursor()
 
         #to save photos to upload folder
         uploadfile.save(os.path.join(app.config['Uploads'], filename))
         photo_data = base64.standard_b64encode(uploadfile.read())
+
+        #format tags
+        lst = []
+        for i in tags:
+            if ' ' in i:
+                e = i.rstrip(' ').split(' ')
+                for j in e:
+                    if j != '':
+                        lst.append(j)
+            elif i != '':
+                lst.append(i)
+        print('tag list: ', lst)
+
+        #add tags to database
+        for word in lst:
+            word = str(word)
+            cursor.execute("INSERT INTO Tags (tag) VALUES ('{0}')".format(word))
+
         #print('photodata: ', photo_data)                       #blank for some reason
         cursor = conn.cursor()
         query = "INSERT INTO Photos(imgdata, user_id, caption, photopath, album_id) VALUES('{0}', '{1}', '{2}', '{3}','{4}')".format(photo_data, uid, caption, filename,album_id)
@@ -479,10 +476,9 @@ def upload_file():
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',photos=getUsersPhotos(uid))
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
-        uid = getUserIdFromEmail(flask_login.current_user.id)
-        albumnames = listalbums(uid)
-        return render_template('upload.html', albumname=albumnames)
 
+        albumnames = listalbums()
+        return render_template('upload.html', albumname=albumnames)
 
 #Trying to display photos on profile
 #not completely working yet, getting blue boxes
@@ -490,6 +486,7 @@ def upload_file():
 @app.route('/profile', methods=['GET'])
 def showPhotos():
     uid = getUserIdFromEmail(flask_login.current_user.id)
+    cursor = conn.cursor()
     query = "SELECT photopath " \
             "FROM Photos WHERE user_id = '{0}'".format(uid)
     cursor.execute(query)
@@ -505,6 +502,23 @@ def showPhotos():
     return converted
     #print('photopath: ',photopath)
     #return render_template('profile.html', photopath = "../uploads/img1.png")
+
+#return friend recommendations
+# @flask_login.login_required
+# def friend_recommendations():
+#     uid = getUserIdFromEmail(flask_login.current_user.id)
+#     cursor = conn.cursor()
+#     #need to get users that are not friends
+#     query = "SELECT F2.userID2 "  \
+#             "FROM Friends F" \
+#             "JOIN Friends F2 ON F.userID2 = F2.userID1 " \
+#             "WHERE F2.userID2 NOT IN " \
+#                             "(SELECT F.userID2 FROM Friends " \
+#                              "WHERE userID1 = '{0}' AND F.userID1 = '{0}'".format(uid)
+#     cursor.execute(query)
+#     friendrecs = cursor.fetchall()
+#     print(friendrecs)
+#     return friendrecs
 
 # default page
 @app.route("/", methods=['GET'])

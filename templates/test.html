@@ -5,8 +5,34 @@
     <title>Title</title>
 </head>
 <body>
-
-<img src="../uploads/img1.png" alt="can't show" />
-
+<img src="../uploads/img1.png" alt="can't show the image">
+<img src="http://ichef.bbci.co.uk/news/976/cpsprodpb/B1B7/production/_97459454_gettyimages-813932920.jpg" >
 </body>
 </html>
+
+#return friend recommendations
+# @flask_login.login_required
+# def friend_recommendations():
+#     uid = getUserIdFromEmail(flask_login.current_user.id)
+#     cursor = conn.cursor()
+#     #need to get users that are not friends
+#     query = "SELECT F2.userID2 "  \
+#             "FROM Friends F, Friends F2 " \
+#             "JOIN Friends F2 ON F.userID2 = F2.userID1 " \
+#             "WHERE F2.userID2 NOT IN " \
+#                             "(SELECT F.userID2 FROM Friends " \
+#                              "WHERE userID1 = '{0}' AND F.userID1 = '{0}'".format(uid)
+#     cursor.execute(query)
+#     friendrecs = cursor.fetchall()
+#     print(friendrecs)
+#     return friendrecs
+
+{#in search.html #}
+{#    <h2>Users To Add </h2>#}
+{#    <div class = "friendrecs">#}
+{#    <ul>#}
+{#        {% for user in friendrecs %}#}
+{#            <li><a href="/addfriend/{{user[0]}}"> {{user[1] + ' ' + user[2]}} </a></li>#}
+{#        {% endfor %}#}
+{#    </ul>#}
+{#    </div>#}
