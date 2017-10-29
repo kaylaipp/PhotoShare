@@ -10,8 +10,11 @@
 
 </head>
 <body>
+{% if message  %}
+  <h1>{{ message }}</h1>
+{% endif %}
     <h1>{{ album }}</h1>
-
+    <a href='/deletealbum/{{album}}'>Delete Album</a>
 {#    {% if album %}#}
 {#        {% for eachalbum in album %}#}
 {#        <li><a href="/view_album/{{user[0]}}"> {{album[1] + ' ' + album[2]}} </a></li>#}
@@ -26,6 +29,7 @@
         {% endfor %}
     {# for testing, but following line also doens't work  #}
 {#     <img src="../uploads/img2.png"> #}
+
 {% endif %}
 
     <div class="nav">

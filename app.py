@@ -28,8 +28,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -171,8 +171,8 @@ def listalbums(uid):
                      "FROM Albums " \
                      "WHERE  "\
                      "albumOwner = '{0}'".format(uid) #
-
-    cursor = conn.cursor()
+    # albumnames = "SELECT name FROM Albums WHERE albumOwner = '{0}'".format(uid)
+    # cursor = conn.cursor()
 
     albumnames = cursor.execute(albumnames)
     albumnames = cursor.fetchall()
@@ -181,7 +181,7 @@ def listalbums(uid):
     for name in albumnames:
         name = str(name)
         converted.append(name[3:-3])
-    #return albumnames
+    print(albumnames)
 
     return converted
 
@@ -264,7 +264,7 @@ def isEmailUnique(email):
 def isAlbumNameUnique(name,uid):
 
     cursor = conn.cursor()
-    if cursor.execute("SELECT name FROM Album WHERE name = '{0}' AND albumOwner = '{1}'".format(name,uid)):
+    if cursor.execute("SELECT name FROM Albums WHERE name = '{0}' AND albumOwner = '{1}'".format(name,uid)):
         # this means there are greater than zero entries with that album_title
         return False
     else:
@@ -309,6 +309,16 @@ def deletePhoto(photoID):
     cursor.execute("DELETE FROM Photos WHERE photoid='{0}'".format(photoID))
     conn.commit()
 
+#delete albums
+@app.route("/deletealbum/<album>", methods=['GET'])
+@flask_login.login_required
+def delete_album(album):
+        uid=getUserIdFromEmail(flask_login.current_user.id)
+        cursor=conn.cursor()
+        albumid = getAlbumID(uid, album)
+        cursor.execute("DELETE FROM Albums WHERE albumOwner='{0}' AND albumID='{1}'".format(uid,albumid))
+        conn.commit()
+        return render_template('view_album.html', message='Album deleted!')
 
 
 #display your friends on your profile page
@@ -575,7 +585,6 @@ def upload_file():
         # img = open(filename, 'wb')
         # img.write(base64.decodestring(photo_data))
         # print('upload_photo: ', photo_data)
-
 
         conn.commit()
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',photos=getUsersPhotos(uid))
