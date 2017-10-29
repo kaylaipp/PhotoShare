@@ -81,6 +81,11 @@
   <p>You should <a href='/login'>login!</a></p>
 {% endif %}
 
+<form method="post" action="{{ url_for('search_tags') }}">
+     <label for="tag_word">Find photos by tag:</label>
+     <input type="tag_word" name="tag_word" /><br />
+</form>
+
 <div class = 'profilenav'>
     <ul>
     <li><a href='/new_album'>Create new album</a></li>

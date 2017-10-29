@@ -267,9 +267,25 @@ def getUsersFriends(uid):
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getTopTags():
-	cursor=conn.cursor()
-	cursor.execute("SELECT tag FROM Tags GROUP BY tag ORDER BY COUNT(*) DESC LIMIT 5")
-	return cursor.fetchall()
+    cursor = conn.cursor()
+    query = "SELECT tag FROM Tags GROUP BY tag ORDER BY COUNT(*) DESC LIMIT 5"
+    taglist = cursor.execute(query)
+    taglist = cursor.fetchall()
+    converted = []
+    for tag in taglist:
+        tag = str(tag)
+        converted.append(tag[3:-3])
+    return converted
+
+
+#should return photoid, as imgdata is blank
+def getTaggedPhotos(tag_word):
+    cursor = conn.cursor()
+    cursor.execute("SELECT p.imgdata, p.photoid FROM Photos p, Has_Tag h, Tags t WHERE h.photoid=p.photoid \
+                    AND h.tagID = t.tagID AND t.tag ='{0}'".format(tag_word))
+    photos = cursor.fetchall()
+    print(photos)
+    return photos
 
 #display your friends on your profile page
 @app.route('/friends', methods=['GET'])
@@ -545,6 +561,7 @@ def upload_file():
 #Trying to display photos on profile
 #not completely working yet, getting blue boxes
 #^ I'm not even getting those
+# @yuta, the blue boxes don't show on chrome, but it shows on safari i believe
 @app.route('/profile', methods=['GET'])
 def showPhotos():
     uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -582,6 +599,11 @@ def showPhotos():
 #     print(friendrecs)
 #     return friendrecs
 
+#To search tags
+@app.route('/search_tags', methods=['GET', 'POST'])
+def search_tags():
+    tag_word = request.form.get('tag_word')
+    return render_template('view_album.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos(tag_word))
 # default page
 @app.route("/", methods=['GET'])
 def hello():
