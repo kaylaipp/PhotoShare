@@ -443,18 +443,34 @@ def upload_file():
     Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
     #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/uploads'
     app.config['Uploads'] = Uploads
+
     if request.method == 'POST':
         uid = getUserIdFromEmail(flask_login.current_user.id)
         uploadfile = request.files['photo']
+        ext = uploadfile.filename.rsplit('.', 1)[1]
         caption = request.form.get('caption')
         album_id = getAlbumID(uid,request.form.get('album'))
         tags = request.form.get('tags').rstrip(',').split(',')
         filename = "../uploads/" + uploadfile.filename
         cursor = conn.cursor()
 
+        print('upload photo path/filename: ',filename)
+
         #to save photos to upload folder
         uploadfile.save(os.path.join(app.config['Uploads'], filename))
         photo_data = base64.standard_b64encode(uploadfile.read())
+
+
+        #add photo info to database
+        cursor = conn.cursor()
+        query = "INSERT INTO Photos(imgdata, user_id, caption, photopath, album_id) " \
+                "VALUES('{0}', '{1}', '{2}', '{3}','{4}')".format(photo_data, uid, caption, filename,album_id)
+        cursor.execute(query)
+
+        # get the photo id
+        cursor = conn.cursor()
+        cursor.execute("SELECT MAX(photoid) FROM Photos")
+        photoid = cursor.fetchall()[0][0]
 
         #format tags
         lst = []
@@ -468,15 +484,42 @@ def upload_file():
                 lst.append(i)
         print('tag list: ', lst)
 
-        #add tags to database
+        #add tags to Tags table
         for word in lst:
             word = str(word)
             cursor.execute("INSERT INTO Tags (tag) VALUES ('{0}')".format(word))
 
-        #print('photodata: ', photo_data)                       #blank for some reason
+        for tag in lst:
+            cursor = conn.cursor()
+            cursor.execute("SELECT tagID FROM Tags WHERE tag = '{0}'".format(tag))
+            tagID = cursor.fetchall()
+            if len(tagID) == 0:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO Tags (tag) VALUES ('{0}')".format(tag))
+                cursor = conn.cursor()
+                cursor.execute("SELECT MAX(tagID) from Tags")
+                tagID = cursor.fetchall()
+
+        #add tags to has_tags table
         cursor = conn.cursor()
-        query = "INSERT INTO Photos(imgdata, user_id, caption, photopath, album_id) VALUES('{0}', '{1}', '{2}', '{3}','{4}')".format(photo_data, uid, caption, filename,album_id)
-        cursor.execute(query)
+        cursor.execute(
+            "SELECT tagID, photoid FROM Has_Tag WHERE tagID = '{0}' AND photoid='{1}'".format(tagID[0][0],
+                                                                                                      photoid))
+        result = cursor.fetchall()
+        if len(result) == 0:
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO Has_Tag (tagID, photoid) VALUES ('{0}', '{1}')".format(tagID[0][0], photoid))
+
+        #figuring out path for photo
+        # path = "/Users/kaylaippongi/Desktop/Photoshare/uploads/{}".format(str(album_id)) \
+        #        + "." + ext
+        # filename = str(filename)
+        # img = open(filename, 'wb')
+        # img.write(base64.decodestring(photo_data))
+        # print('upload_photo: ', photo_data)
+
+
         conn.commit()
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',photos=getUsersPhotos(uid))
     # The method is GET so we return a  HTML form to upload the a photo.
