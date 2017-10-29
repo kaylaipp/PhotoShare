@@ -257,6 +257,15 @@ def getTopTags():
 	cursor.execute("SELECT tag FROM Tags GROUP BY tag ORDER BY COUNT(*) DESC LIMIT 5")
 	return cursor.fetchall()
 
+#should return photoid, as imgdata is blank
+def getTaggedPhotos(tag_word):
+    cursor = conn.cursor()
+    cursor.execute("SELECT p.imgdata, p.photoid FROM Photos p, Has_Tag h, Tags t WHERE h.photoid=p.photoid \
+                    AND h.tagID = t.tagID AND t.tag ='{0}'".format(tag_word))
+    photos = cursor.fetchall()
+    print(photos)
+    return photos
+
 #display your friends on your profile page
 @app.route('/friends', methods=['GET'])
 def displayFriends():
@@ -568,6 +577,11 @@ def showPhotos():
 #     print(friendrecs)
 #     return friendrecs
 
+#To search tags
+@app.route('/search_tags', methods=['GET', 'POST'])
+def search_tags():
+    tag_word = request.form.get('tag_word')
+    return render_template('view_album.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos(tag_word))
 # default page
 @app.route("/", methods=['GET'])
 def hello():
