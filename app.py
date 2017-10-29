@@ -177,7 +177,7 @@ def listalbums(uid):
     if (unsorted_count < 1):
         albumnames = "SELECT name " \
                  "FROM Albums " \
-                 "WHERE  name != 'unsorted' AND "\
+                 "WHERE  name != 'Unsorted' AND "\
                  "albumOwner = '{0}'".format(uid)
     else:
         albumnames = "SELECT name " \
@@ -307,6 +307,23 @@ def getTaggedPhotos(tag_word):
     print(photos)
     return photos
 
+
+
+#delete albums
+@app.route("/deletealbum/<album>", methods=['GET'])
+@flask_login.login_required
+def delete_album(album):
+        uid=getUserIdFromEmail(flask_login.current_user.id)
+        cursor=conn.cursor()
+        albumid = getAlbumID(uid, album)
+        cursor.execute("DELETE FROM Albums WHERE albumOwner='{0}' AND albumID='{1}'".format(uid,albumid))
+        conn.commit()
+        return render_template('view_album.html', message='Album deleted!')
+
+
+#delete pictures
+@app.route("/deletepicture/<photoID>", methods=['GET'])
+@flask_login.login_required
 # need to find a way to link this up to everything else but should work
 def deletePhoto(photoID):
     cursor = conn.cursor()
@@ -320,18 +337,20 @@ def deletePhoto(photoID):
     conn.commit()
     cursor.execute("DELETE FROM Photos WHERE photoid='{0}'".format(photoID))
     conn.commit()
+    email = flask_login.current_user.id
+    name = getNameFromEmail(email)
+    user = getUserIdFromEmail(email)
+    #uid = getNameFromEmail(email)
+    #photos = getUsersPhotos(user)
+    photopath = showPhotos()
+    message = "Picture deleted!"
+    albumnames = listalbums(user)
+    numberfriends = friendcount(user)
+    taglist = getTopTags()
 
-#delete albums
-@app.route("/deletealbum/<album>", methods=['GET'])
-@flask_login.login_required
-def delete_album(album):
-        uid=getUserIdFromEmail(flask_login.current_user.id)
-        cursor=conn.cursor()
-        albumid = getAlbumID(uid, album)
-        cursor.execute("DELETE FROM Albums WHERE albumOwner='{0}' AND albumID='{1}'".format(uid,albumid))
-        conn.commit()
-        return render_template('view_album.html', message='Album deleted!')
-
+    return render_template('profile.html', name=flask_login.current_user.id,
+                           firstname=name, albumname = albumnames,
+                           photopath = photopath, numberfriends = numberfriends, tags = taglist, message = message)
 
 #display your friends on your profile page
 @app.route('/friends', methods=['GET'])
@@ -385,14 +404,14 @@ def protected():
     email = flask_login.current_user.id
     name = getNameFromEmail(email)
     user = getUserIdFromEmail(email)
-    uid = getNameFromEmail(email)
-    photos = getUsersPhotos(user)
+    #uid = getNameFromEmail(email)
+    #photos = getUsersPhotos(user)
     photopath = showPhotos()
-    print("line 390 photopaths are", photopath)
+
     albumnames = listalbums(user)
     numberfriends = friendcount(user)
     taglist = getTopTags()
-    print("albumnames line 619", albumnames)###################
+
     return render_template('profile.html', name=flask_login.current_user.id,
                            firstname=name, albumname = albumnames,
                            photopath = photopath, numberfriends = numberfriends, tags = taglist)
