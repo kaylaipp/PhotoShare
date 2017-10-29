@@ -286,6 +286,22 @@ def getTaggedPhotos(tag_word):
     print(photos)
     return photos
 
+# need to find a way to link this up to everything else but should work
+def deletePhoto(photoID):
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Has_Comment where photoid = '{0}'".format(photoID))
+    conn.commit()
+    cursor.execute("DELETE FROM Likes where photoID = '{0}'".format(photoID))
+    conn.commit()
+    cursor.execute("DELETE FROM Has_Tag WHERE photoid='{0}'".format(photoID))
+    conn.commit()
+    cursor.execute("DELETE FROM Belongs_To WHERE photoID='{0}'".format(photoID))
+    conn.commit()
+    cursor.execute("DELETE FROM Photos WHERE photoid='{0}'".format(photoID))
+    conn.commit()
+
+
+
 #display your friends on your profile page
 @app.route('/friends', methods=['GET'])
 def displayFriends():
