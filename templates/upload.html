@@ -6,6 +6,9 @@
     <link rel="stylesheet" type="text/css" href="../static/style.css">
     <title>Upload a photo!</title>
 </head>
+    <div class = 'nav'>
+        <li><a href='/profile'>Home</a></li>
+    </div>
     <body>
         <div class="title">
             <h1>Upload a photo to Photoshare</h1>
@@ -16,6 +19,8 @@
                 <input type="file" name="photo" required /><br />
                 <label for="caption">Please caption:</label>
                 <input type="text" name="caption"  /><br />
+                <label for="tags">Tags:</label>
+                <input type="text" name="tag"  /><br />
 
 
                 Choose album upload into: <select name="album">
@@ -24,6 +29,7 @@
                     {%  for album in albumname %}
                     <option value="{{ album }}">{{ album }}</option>
                     {%  endfor %}
+
                 {% endif %}
                 </select>
 
