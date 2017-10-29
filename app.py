@@ -253,9 +253,16 @@ def getUsersFriends(uid):
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getTopTags():
-	cursor=conn.cursor()
-	cursor.execute("SELECT tag FROM Tags GROUP BY tag ORDER BY COUNT(*) DESC LIMIT 5")
-	return cursor.fetchall()
+    cursor = conn.cursor()
+    query = "SELECT tag FROM Tags GROUP BY tag ORDER BY COUNT(*) DESC LIMIT 5"
+    taglist = cursor.execute(query)
+    taglist = cursor.fetchall()
+    converted = []
+    for tag in taglist:
+        tag = str(tag)
+        converted.append(tag[3:-3])
+    return converted
+
 
 #should return photoid, as imgdata is blank
 def getTaggedPhotos(tag_word):
@@ -540,6 +547,7 @@ def upload_file():
 #Trying to display photos on profile
 #not completely working yet, getting blue boxes
 #^ I'm not even getting those
+# @yuta, the blue boxes don't show on chrome, but it shows on safari i believe
 @app.route('/profile', methods=['GET'])
 def showPhotos():
     uid = getUserIdFromEmail(flask_login.current_user.id)
