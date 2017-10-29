@@ -277,7 +277,6 @@ def getTopTags():
         converted.append(tag[3:-3])
     return converted
 
-
 #should return photoid, as imgdata is blank
 def getTaggedPhotos(tag_word):
     cursor = conn.cursor()
@@ -399,6 +398,7 @@ def search_friends():
 #     result = cursor.fetchall()
 #     return render_template('search.html', users = result, message="Comment search results:")
 
+#friend profile not necessary anymore..will delete later
 #when you click each user, get their info to display their profile
 #display info such as: their name, photos, if you are friends or not
 # @app.route('/friendprofile')
@@ -600,10 +600,18 @@ def showPhotos():
 #     return friendrecs
 
 #To search tags
-@app.route('/search_tags', methods=['GET', 'POST'])
-def search_tags():
-    tag_word = request.form.get('tag_word')
-    return render_template('view_album.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos(tag_word))
+# @app.route('/search_tags', methods=['GET', 'POST'])
+# def search_tags():
+#     tag_word = request.form.get('tag_word')
+#     return render_template('view_album.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos(tag_word))
+
+@app.route('/all/<tag>', methods=['GET'])
+def search_tags(tag):
+    tagged = getTaggedPhotos(tag)
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    return render_template('search.html', photos=tagged,
+                           message="Here are all photos tagged with: " + tag)
+
 # default page
 @app.route("/", methods=['GET'])
 def hello():
