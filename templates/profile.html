@@ -29,7 +29,10 @@
     <div class = "albums">
     <ul>
         {% for album in albumname %}
-            <li><a href="/view_album"> {{ album }} </a></li>
+            <form method="POST" action="{{ url_for('view_album') }}">
+            <li><input type="submit" name="album" value="{{ album }}"> </li>
+            </form>
+
         {% endfor %}
     </ul>
     </div>
