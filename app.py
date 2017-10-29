@@ -187,9 +187,9 @@ def view_album():
 
         try:
             uid = getUserIdFromEmail(flask_login.current_user.id)
-            albumid = getAlbumID(uid,album)
+            albumid = getAlbumID(uid,str(album))
             photos = getPhotosFromAlbum(uid, albumid)
-            print(photos)
+            print(photos) ############################################### this isnt't working
         except:
             print("couldn't find all tokens")
             #return render_template('view_album.html', album=albumname, albumid = album[1])
@@ -223,7 +223,9 @@ def getUsersAlbums(uid):
 def getAlbumID(uid,albumname):
     cursor = conn.cursor()
     cursor.execute("SELECT albumID FROM Albums WHERE albumOwner = '{0}' AND name = '{1}' ".format(uid,albumname))
-    return cursor.fetchall()
+    ret = cursor.fetchall()
+    ret = str(ret)[2:-4]
+    return ret
 
 
 def getUserIdFromEmail(email):
@@ -284,6 +286,7 @@ def getUserId(first_name, last_name):
     return user_id
 
 # end login code
+
 #display current user profile
 @app.route('/profile')
 @flask_login.login_required
@@ -421,33 +424,36 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
-    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads'
+    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/uploads'
     app.config['Uploads'] = Uploads
     if request.method == 'POST':
         uid = getUserIdFromEmail(flask_login.current_user.id)
         uploadfile = request.files['photo']
         caption = request.form.get('caption')
-        album_id = request.form.get('album_id')
+        album_id = getAlbumID(uid,request.form.get('album'))
         filename = "../uploads/" + uploadfile.filename            #img1.png, img2.png
         cursor = conn.cursor()
 
         #to save photos to upload folder
         uploadfile.save(os.path.join(app.config['Uploads'], filename))
         photo_data = base64.standard_b64encode(uploadfile.read())
-        print('photodata: ', photo_data)                       #blank for some reason
+        #print('photodata: ', photo_data)                       #blank for some reason
         cursor = conn.cursor()
-        query = "INSERT INTO Photos(imgdata, user_id, caption, photopath) VALUES('{0}', '{1}', '{2}', '{3}')".format(photo_data, uid, caption, filename)
+        query = "INSERT INTO Photos(imgdata, user_id, caption, photopath, album_id) VALUES('{0}', '{1}', '{2}', '{3}','{4}')".format(photo_data, uid, caption, filename,album_id)
         cursor.execute(query)
         conn.commit()
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',photos=getUsersPhotos(uid))
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
-        return render_template('upload.html')
+
+        albumnames = listalbums()
+        return render_template('upload.html', albumname=albumnames)
 
 
 #Trying to display photos on profile
 #not completely working yet, getting blue boxes
+#^ I'm not even getting those
 @app.route('/profile', methods=['GET'])
 def showPhotos():
     uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -458,7 +464,7 @@ def showPhotos():
     converted = []
     for path in photopath:
         path = str(path)
-        print(path[3:-7])
+        print("[line 462 in showPhotos()] photopath is ",path[3:-7]) ####################################
         converted.append(path[3:-7])
     #take brackets off of final list
     converted = str(converted)[1:-1]

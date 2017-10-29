@@ -13,10 +13,21 @@
             <form method="post" enctype="multipart/form-data" action="/upload">
 
                 <label for="photo">Select photo:</label>
-                <input type="file" name="photo" required='true' /><br />
+                <input type="file" name="photo" required /><br />
                 <label for="caption">Please caption:</label>
                 <input type="text" name="caption"  /><br />
 
+
+                {% if albumname %}
+                 Choose album upload into: <select name="album">
+                    <option value="unsorted">Decide Later</option>
+                    {%  for album in albumname %}
+                    <option value="{{ album }}">{{ album }}</option>
+                    {%  endfor %}
+
+                </select>
+                {% endif %}
+                <br />
                 <input type="submit" value="Upload" />
             </form>
     </body>
