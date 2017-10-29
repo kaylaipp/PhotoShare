@@ -28,8 +28,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -293,6 +293,7 @@ def protected():
     uid = getNameFromEmail(flask_login.current_user.id)
     photos = getUsersPhotos(user)
     photopath = showPhotos()
+    print('profile photopath: ', photopath)
     albumnames = listalbums()
     numberfriends = friendcount(user)
     return render_template('profile.html', name=flask_login.current_user.id,
@@ -429,7 +430,7 @@ def upload_file():
         uploadfile = request.files['photo']
         caption = request.form.get('caption')
         album_id = request.form.get('album_id')
-        filename = "../uploads/" + uploadfile.filename            #img1.png, img2.png
+        filename = "../uploads/" + uploadfile.filename +".png"           #img1.png, img2.png
         cursor = conn.cursor()
 
         #to save photos to upload folder
@@ -458,10 +459,9 @@ def showPhotos():
     converted = []
     for path in photopath:
         path = str(path)
-        print(path[3:-7])
         converted.append(path[3:-7])
     #take brackets off of final list
-    converted = str(converted)[1:-1]
+    #converted = str(converted)[1:-1]
     print('showPhotos(): ', converted)
     return converted
     #print('photopath: ',photopath)

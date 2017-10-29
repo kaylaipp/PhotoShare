@@ -7,6 +7,10 @@
     <title>Upload a photo!</title>
 </head>
     <body>
+        <div class = 'nav'>
+        <li><a href='/profile'>Home</a></li>
+    </div>
+
         <div class="title">
             <h1>Upload a photo to Photoshare</h1>
         </div>
@@ -14,8 +18,12 @@
 
                 <label for="photo">Select photo:</label>
                 <input type="file" name="photo" required='true' /><br />
-                <label for="caption">Please caption:</label>
+                <label for="caption">Caption:</label>
                 <input type="text" name="caption"  /><br />
+                <label for="album">Album:</label>
+                <input type="text" name="album"  /><br />
+                <label for="tags">Tags(no hastag needed, separate by commas):</label>
+                <input type="text" name="tags"  /><br />
 
                 <input type="submit" value="Upload" />
             </form>

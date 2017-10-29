@@ -39,13 +39,12 @@
 {%  endif  %}
 
 
-
-
-
-{#{% if photopath %}#}
-    {# causing photos not to appear for some reason?  #}
-{#      <img src={{ photopath }}>#}
-{#{% endif %}#}
+{% if photopath %}
+    {% for photo in photopath %}
+      <img src={{ photo }}>
+    {% endfor %}
+{% endif %}
+<img src="../uploads/img3.png">
 
 {#{% if photos %}#}
 {#<h2>Your photos</h2>#}
