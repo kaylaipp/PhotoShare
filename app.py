@@ -451,8 +451,8 @@ def create_album():
     else:
         return render_template('new_album.html', supress = True)
 
-# Problems: doesn't store imgdata for some reason under python 2.7 and 3
-# also doesn't show photos on profile at all. Even with correect pathname
+# Problems: doesn't store imgdata for some reason under python 2.7
+# also doesn't show photos on profile at all. Even with correct pathname
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
@@ -470,7 +470,7 @@ def upload_file():
         filename = "../uploads/" + uploadfile.filename
         cursor = conn.cursor()
 
-        print('upload photo path/filename: ',filename)
+        print('upload photo full filename: ',filename)
 
         #to save photos to upload folder
         uploadfile.save(os.path.join(app.config['Uploads'], filename))
@@ -546,8 +546,6 @@ def upload_file():
 
 #Trying to display photos on profile
 #not completely working yet, getting blue boxes
-#^ I'm not even getting those
-# @yuta, the blue boxes don't show on chrome, but it shows on safari i believe
 @app.route('/profile', methods=['GET'])
 def showPhotos():
     uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -562,11 +560,9 @@ def showPhotos():
         print("[line 462 in showPhotos()] photopath is ",path[3:-7]) ####################################
         converted.append(path[3:-7])
     #take brackets off of final list
-    #converted = str(converted)[1:-1]
     print('showPhotos(): ', converted)
     return converted
-    #print('photopath: ',photopath)
-    #return render_template('profile.html', photopath = "../uploads/img1.png")
+
 
 #return friend recommendations
 # @flask_login.login_required

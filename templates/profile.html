@@ -38,48 +38,40 @@
     </div>
 {%  endif  %}
 
-
+{#photopath for each photo #}
+{#problem lies here! #}
 {% if photopath %}
     {% for photo in photopath %}
       <img src={{ photo }}>
-        <img src="../uploads/img1.png">
+{#        below is for testing, will show if only loading profile.hmtl by itself#}
+{#        will show as blue box when run through app.py#}
+        <img src="../uploads/img6.png">
     {% endfor %}
 {% endif %}
 
-
+{#not using this method anymore, see photopath above#}
 {#{% if photos %}#}
-{#<h2>Your photos</h2>#}
-{#    <ul>#}
-{#    {% for photo in photos %}#}
-{#        <li>{{photo[2]}}<br>#}
-{#        <li><img src='data:image/png;base64, {{photo[0]}}'/></li>#}
-{#    {% endfor %}#}
-{#    </ul>#}
-{#{% endif %}#}
-{% if photos %}
-<h2>Here's your photos</h2>
-   <ul>
-   {% for photo in photos %}
+{#<h2>Here's your photos</h2>#}
+{#   <ul>#}
+{#   {% for photo in photos %}#}
 {#       <li><a href = '/albums?photo_id={{photo[2]}}'>caption: {{photo[1]}} photo id: {{photo[2]}}</a></li>#}
-       <li><img src='data:image/png;base64, {{photo[0]}}'/></li>
-   {% endfor %}
-   </ul>
-{% endif %}
+{#       <li><img src='data:image/png;base64, {{photo[0]}}'/></li>#}
+{#   {% endfor %}#}
+{#   </ul>#}
+{#{% endif %}#}
 
+{#display top tags #}
 {% if tags %}
 <h3> Top 5 tags </h3>
      {% for t in tags %}
-{#         <form method="post" action="{{ url_for('tagged_photos') }}">#}
-{#            <button class="button" name="tag_word" type="submit" value={{t[2]}}>#{{t[2]}}</button>#}
-{#         </form>#}
          <li><a href='/all/{{t}}'>{{t}}</a> </li>
-
      {% endfor %}
 {% endif %}
 
 {% if message is none %}
   <p>You should <a href='/login'>login!</a></p>
 {% endif %}
+<img src = "../uploads/img3.png">
 
 {#<form method="post" action="{{ url_for('search_tags') }}">#}
 {#     <label for="tag_word">Find photos by tag:</label>#}
@@ -89,7 +81,6 @@
 <div class = 'profilenav'>
     <ul>
     <li><a href='/new_album'>Create new album</a></li>
-{#    <li><a href='/view_album'>View albums</a></li>#}
     <li><a href='/upload'>Upload a photo</a></li>
     <li><a href='/search'>Search For Friends</a></li>
     <li><a href='/logout'>Logout</a></li>
