@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://raw.githubusercontent.com/kaylaipp/PhotoShare/master/templates/pastylesheet.css">
         <!--<link rel="stylesheet" href="https://github.com/kaylaipp/PhotoShare/blob/master/templates/pastylesheet.css">
         -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -42,12 +42,23 @@
 {#problem lies here! #}
 {% if photopath %}
     {% for photo in photopath %}
-      <img src={{ photo }}>
-{#        below is for testing, will show if only loading profile.hmtl by itself#}
-{#        will show as blue box when run through app.py#}
-        <img src="../uploads/img6.png">
+        
+        <img src="../static/uploads/{{ photo }}">
+
     {% endfor %}
 {% endif %}
+
+{##}
+{#{% if photopath %}#}
+{#    {% for photo in photopath %}#}
+      {#  <iframe src="{{ photo }}" height="200" width="300"></iframe>#}
+{##}
+{#        <iframe src="../static/uploads/Screenshot_20161208-201759.jpg" height="200" width="300" ></iframe>#}
+{##}
+{#    {% endfor %}#}
+{#{% endif %}#}
+
+
 
 {#not using this method anymore, see photopath above#}
 {#{% if photos %}#}

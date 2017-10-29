@@ -28,8 +28,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -153,7 +153,8 @@ def register_user():
         date = time.strftime("%Y-%m-%d")
         createUnsorted(uid, date)
 
-        return render_template('profile.html', name=firstname, message='Account Created!')
+        #return render_template('profile.html', name=firstname, message='Account Created!')
+        return flask.redirect(flask.url_for('profile.html', name=firstname, message='Account Created!'))
     else:
         print("couldn't find all tokens")
         return render_template('register.html', supress=False)
@@ -380,12 +381,14 @@ def getUserId(first_name, last_name):
 @app.route('/profile')
 @flask_login.login_required
 def protected():
-    name = getNameFromEmail(flask_login.current_user.id)
-    user = getUserIdFromEmail(flask_login.current_user.id)
-    uid = getNameFromEmail(flask_login.current_user.id)
+    email = flask_login.current_user.id
+    name = getNameFromEmail(email)
+    user = getUserIdFromEmail(email)
+    uid = getNameFromEmail(email)
     photos = getUsersPhotos(user)
     photopath = showPhotos()
-    albumnames = listalbums(getUserIdFromEmail(flask_login.current_user.id))
+    print("line 390 photopaths are", photopath)
+    albumnames = listalbums(user)
     numberfriends = friendcount(user)
     taglist = getTopTags()
     return render_template('profile.html', name=flask_login.current_user.id,
@@ -527,17 +530,18 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/uploads'
+    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
         uid = getUserIdFromEmail(flask_login.current_user.id)
         uploadfile = request.files['photo']
-        ext = uploadfile.filename.rsplit('.', 1)[1]
+        #ext = uploadfile.filename.rsplit('.', 1)[1]
         caption = request.form.get('caption')
         album_id = getAlbumID(uid,request.form.get('album'))
         tags = request.form.get('tags').rstrip(',').split(',')
+        filename_NoPath = uploadfile.filename
         filename = Uploads + uploadfile.filename
         cursor = conn.cursor()
 
@@ -551,7 +555,7 @@ def upload_file():
         #add photo info to database
         cursor = conn.cursor()
         query = "INSERT INTO Photos(imgdata, user_id, caption, photopath, album_id) " \
-                "VALUES('{0}', '{1}', '{2}', '{3}','{4}')".format(photo_data, uid, caption, filename,album_id)
+                "VALUES('{0}', '{1}', '{2}', '{3}','{4}')".format(photo_data, uid, caption, filename_NoPath,album_id)
         cursor.execute(query)
 
         # get the photo id
@@ -627,8 +631,8 @@ def showPhotos():
     converted = []
     for path in photopath:
         path = str(path)
-        print("[line 462 in showPhotos()] photopath is ",path[3:-7]) ####################################
-        converted.append(path[3:-7])
+        print("[line 462 in showPhotos()] photopath is ",path[3:-3]) ####################################
+        converted.append(path[3:-3])                                  #### tried changing slice to include ext
     #take brackets off of final list
     print('showPhotos(): ', converted)
     return converted
