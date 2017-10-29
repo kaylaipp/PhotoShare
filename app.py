@@ -200,7 +200,7 @@ def getUsersPhotos(uid):
     #cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id = '{0}'".format(uid))
     cursor.execute("SELECT imgdata, photoid, caption FROM Photos WHERE user_id = '{0}'".format(uid))
     photos = cursor.fetchall()
-    print(photos)
+    print('getUsersPhotos: ', photos)
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getPhotosFromAlbum(uid,albumid):
@@ -249,7 +249,7 @@ def displayFriends():
             uid)
     cursor.execute(query)
     friends = cursor.fetchall()
-    print('friends: ', friends)
+    #print('friends: ', friends)
     return render_template('friends.html', friends = friends, message = "Your Friends")
 
 def friendcount(uid):
@@ -287,8 +287,7 @@ def protected():
     user = getUserIdFromEmail(flask_login.current_user.id)
     album = getUsersAlbums(user)[2:-2]
     uid = getNameFromEmail(flask_login.current_user.id)
-    #photos = getUsersPhotos(user)
-    #photopath = showPhotos(user)
+    photos = getUsersPhotos(user)
     photopath = showPhotos()
     albumnames = listalbums()
     numberfriends = friendcount(user)
@@ -413,11 +412,13 @@ def create_album():
     else:
         return render_template('new_album.html', supress = True)
 
+# Problems: doesn't store imgdata for some reason under python 2.7 and 3
+# also doesn't show photos on profile at all. Even with correect pathname
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
     Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads'
+    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads'
     app.config['Uploads'] = Uploads
     if request.method == 'POST':
         uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -430,25 +431,16 @@ def upload_file():
         #to save photos to upload folder
         uploadfile.save(os.path.join(app.config['Uploads'], filename))
         photo_data = base64.standard_b64encode(uploadfile.read())
-        print(photo_data)                       #blank for some reason
+        print('photodata: ', photo_data)                       #blank for some reason
         cursor = conn.cursor()
         query = "INSERT INTO Photos(imgdata, user_id, caption, photopath) VALUES('{0}', '{1}', '{2}', '{3}')".format(photo_data, uid, caption, filename)
         cursor.execute(query)
-        #cursor.execute(
-            #"INSERT INTO Pictures(imgdata, user_id, caption) \
-             #VALUES ('{0}', '{1}', '{2}' )".format(photo_data, uid, caption))
-            # getting a mysql syntax error when trying to upload but IDK WHY
-
-            #I think it should work now! or at least error out of the way lol
-            # used 'Photos' instead of 'Pictures' same thing in getUsersPhotos()
-            #also had to do with the variable photo_data, python 3 doesn't support it, so change interpreter to 2.7
-
         conn.commit()
-        return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',
-                               photos=getUsersPhotos(uid))
+        return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',photos=getUsersPhotos(uid))
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
         return render_template('upload.html')
+
 
 #Trying to display photos on profile
 #not completely working yet, getting blue boxes
@@ -458,9 +450,18 @@ def showPhotos():
     query = "SELECT photopath " \
             "FROM Photos WHERE user_id = '{0}'".format(uid)
     cursor.execute(query)
-    #photopath = cursor.fetchall()
+    photopath = cursor.fetchall()
+    converted = []
+    for path in photopath:
+        path = str(path)
+        print(path[3:-7])
+        converted.append(path[3:-7])
+    #take brackets off of final list
+    converted = str(converted)[1:-1]
+    print('showPhotos(): ', converted)
+    return converted
     #print('photopath: ',photopath)
-    return render_template('profile.html', photopath = "../uploads/img1.png")
+    #return render_template('profile.html', photopath = "../uploads/img1.png")
 
 # default page
 @app.route("/", methods=['GET'])

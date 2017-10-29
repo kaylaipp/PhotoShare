@@ -37,21 +37,28 @@
 
 
 
-{% if photopath %}
+{#{% if photopath %}#}
     {# causing photos not to appear for some reason?  #}
-      <img src={{ photopath }}>
-    {# for testing, but following line also doens't work  #}
-{#     <img src="../uploads/img2.png"> #}
-{% endif %}
+{#      <img src={{ photopath }}>#}
+{#{% endif %}#}
 
-{% if photos %}
-<h2>Your photos</h2>
-    <ul>
-    {% for photo in photos %}
+{#{% if photos %}#}
+{#<h2>Your photos</h2>#}
+{#    <ul>#}
+{#    {% for photo in photos %}#}
 {#        <li>{{photo[2]}}<br>#}
-        <li><img src='data:image/png;base64, {{photo[0]}}'/></li>
-    {% endfor %}
-    </ul>
+{#        <li><img src='data:image/png;base64, {{photo[0]}}'/></li>#}
+{#    {% endfor %}#}
+{#    </ul>#}
+{#{% endif %}#}
+{% if photos %}
+<h2>Here's your photos</h2>
+   <ul>
+   {% for photo in photos %}
+{#       <li><a href = '/albums?photo_id={{photo[2]}}'>caption: {{photo[1]}} photo id: {{photo[2]}}</a></li>#}
+       <li><img src='data:image/png;base64, {{photo[0]}}'/></li>
+   {% endfor %}
+   </ul>
 {% endif %}
 
 {% if message is none %}
