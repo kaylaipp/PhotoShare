@@ -28,8 +28,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -467,7 +467,7 @@ def showPhotos():
         print("[line 462 in showPhotos()] photopath is ",path[3:-7]) ####################################
         converted.append(path[3:-7])
     #take brackets off of final list
-    converted = str(converted)[1:-1]
+    #converted = str(converted)[1:-1]
     print('showPhotos(): ', converted)
     return converted
     #print('photopath: ',photopath)

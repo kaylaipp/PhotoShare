@@ -6,6 +6,9 @@
     <link rel="stylesheet" type="text/css" href="../static/style.css">
     <title>Upload a photo!</title>
 </head>
+    <div class = 'nav'>
+        <li><a href='/profile'>Home</a></li>
+    </div>
     <body>
         <div class="title">
             <h1>Upload a photo to Photoshare</h1>
@@ -13,10 +16,24 @@
             <form method="post" enctype="multipart/form-data" action="/upload">
 
                 <label for="photo">Select photo:</label>
-                <input type="file" name="photo" required='true' /><br />
+                <input type="file" name="photo" required /><br />
                 <label for="caption">Please caption:</label>
                 <input type="text" name="caption"  /><br />
+                <label for="tags">Tags:</label>
+                <input type="text" name="tag"  /><br />
 
+
+                {% if albumname %}
+                 Choose album upload into: <select name="album">
+                    <option value="unsorted">Decide Later</option>
+                    {%  for album in albumname %}
+                    <option value="{{ album }}">{{ album }}</option>
+                    {%  endfor %}
+
+
+                </select>
+                {% endif %}
+                <br />
                 <input type="submit" value="Upload" />
             </form>
     </body>
