@@ -65,6 +65,17 @@
    </ul>
 {% endif %}
 
+{% if tags %}
+<h3> Here are the top 5 tags </h3>
+     {% for t in tags %}
+{#         <form method="post" action="{{ url_for('tagged_photos') }}">#}
+{#            <button class="button" name="tag_word" type="submit" value={{t[2]}}>#{{t[2]}}</button>#}
+{#         </form>#}
+         <li><a href="/showphotos"> {{ t }} </a></li>
+
+     {% endfor %}
+{% endif %}
+
 {% if message is none %}
   <p>You should <a href='/login'>login!</a></p>
 {% endif %}

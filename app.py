@@ -252,6 +252,10 @@ def getUsersFriends(uid):
     cursor.execute("SELECT user_id2 FROM Friends_with WHERE user_id1 = '{0}'".format(uid))
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
+def getTopTags():
+	cursor=conn.cursor()
+	cursor.execute("SELECT tag FROM Tags GROUP BY tag ORDER BY COUNT(*) DESC LIMIT 5")
+	return cursor.fetchall()
 
 #display your friends on your profile page
 @app.route('/friends', methods=['GET'])
@@ -304,9 +308,10 @@ def protected():
     photopath = showPhotos()
     albumnames = listalbums()
     numberfriends = friendcount(user)
+    taglist = getTopTags()
     return render_template('profile.html', name=flask_login.current_user.id,
                            firstname=name, albumname = albumnames,
-                           photopath = photopath, numberfriends = numberfriends)
+                           photopath = photopath, numberfriends = numberfriends, tags = taglist)
 
 # begin photo uploading code
 # photos uploaded using base64 encoding so they can be directly embeded in HTML
