@@ -15,21 +15,17 @@
 {% endif %}
     <h1>{{ album }}</h1>
     <a href='/deletealbum/{{album}}'>Delete Album</a>
-{#    {% if album %}#}
-{#        {% for eachalbum in album %}#}
-{#        <li><a href="/view_album/{{user[0]}}"> {{album[1] + ' ' + album[2]}} </a></li>#}
-{#        {% endfor %}#}
-{#    {% endif %}#}
 
 
-    {% if photos %}
-    {# causing photos not to appear for some reason?  #}
-        {%  for eachPhoto in photos %}
-      <img src="{{ eachPhoto }}">
-        {% endfor %}
-    {# for testing, but following line also doens't work  #}
-{#     <img src="../uploads/img2.png"> #}
+{% if photopath %}
+    {% for photo in photopath %}
 
+        <img src="../static/uploads/{{ photo[0] }}">
+        <figure>
+        <figcaption>Caption: {{ photo[2] }}</figcaption>
+        </figure>
+
+    {% endfor %}
 {% endif %}
 
     <div class="nav">

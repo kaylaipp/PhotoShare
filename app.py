@@ -210,18 +210,19 @@ def listalbums(uid):
 def view_album():
     if flask.request.method == 'POST':
         album = request.form.get('album')
-        print(album) ############################################################################
+        album = str(album)
 
         try:
             uid = getUserIdFromEmail(flask_login.current_user.id)
-            albumid = getAlbumID(uid,str(album))
-            photos = getPhotosFromAlbum(uid, albumid)
+            albumid = getAlbumID(uid,album)
+            print(albumid)  ############################################### this isnt't working
+            photos = getPhotosFromAlbum(uid,albumid)
             print(photos) ############################################### this isnt't working
         except:
             print("couldn't find all tokens")
             #return render_template('view_album.html', album=albumname, albumid = album[1])
             return render_template('view_album.html', album=album, albumid=albumid)
-        return render_template('view_album.html', album = album, photos = photos, albumid = album)
+        return render_template('view_album.html', album = album, photopath = photos, albumid = album)
 
 
 
@@ -230,12 +231,12 @@ def getUsersPhotos(uid):
     #cursor.execute("SELECT imgdata, picture_id, caption FROM Pictures WHERE user_id = '{0}'".format(uid))
     cursor.execute("SELECT imgdata, photoid, caption FROM Photos WHERE user_id = '{0}'".format(uid))
     photos = cursor.fetchall()
-    print('getUsersPhotos: ', photos)
+    #print('getUsersPhotos: ', photos)
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getPhotosFromAlbum(uid,albumid):
     cursor = conn.cursor()
-    cursor.execute("SELECT imgdata, photo_id, caption FROM Photos \
+    cursor.execute("SELECT photopath, photoid, caption FROM Photos \
                     WHERE Photos.user_id = '{0}' AND Photos.album_id = '{1}'".format(uid,albumid))
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
