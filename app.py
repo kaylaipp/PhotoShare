@@ -171,9 +171,9 @@ def listalbums():
     print(converted)  ###################################
     return converted
 
-@app.route('/view_album')
-def albumpageview():
-	return render_template('view_album.html')
+# @app.route('/view_album')
+# def albumpageview():
+# 	return render_template('view_album.html')
 
 @app.route("/view_album", methods=['GET','POST'])
 def view_album():
@@ -191,9 +191,7 @@ def view_album():
         #return render_template('view_album.html', album=albumname, albumid = album[1])
         return render_template('view_album.html', album=albumname, albumid=albumid)
     return render_template('view_album.html', album = albumname, photos = photos, albumid = album)
-## need to figure out how to get the album id so I can pass it into view_album which can then be passed
-## from there into upload -- bc I want only to be able to upload from within an album
-## UNLESS it's easier to do a general upload and have the user select which album to upload into?
+
 
 
 def getUsersPhotos(uid):
@@ -313,7 +311,7 @@ def protected():
     albumnames = listalbums()
     numberfriends = friendcount(user)
     return render_template('profile.html', name=flask_login.current_user.id,
-                           firstname=name, albumname = albumnames, 
+                           firstname=name, albumname = albumnames,
                            photopath = photopath, numberfriends = numberfriends)
 
 # begin photo uploading code

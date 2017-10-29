@@ -19,8 +19,13 @@
   <p>{{ message }}</p>
 {% endif %}
 
+{% if numberfriends %}
+{#    <li><a href="/allfriends"> {{ numberfriends }} </a>friends</li>#}
+    <li><a href="/friends"> {{ numberfriends }} </a>friends</li>
+{% endif %}
+
 {%  if albumname %}
-<h2>Your Albums</h2>
+<h3>Your Albums</h3>
     <div class = "albums">
     <ul>
         {% for album in albumname %}
@@ -30,10 +35,7 @@
     </div>
 {%  endif  %}
 
-{% if numberfriends %}
-{#    <li><a href="/allfriends"> {{ numberfriends }} </a>friends</li>#}
-    <li><a href="/friends"> {{ numberfriends }} </a>friends</li>
-{% endif %}
+
 
 
 

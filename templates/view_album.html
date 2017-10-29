@@ -11,13 +11,20 @@
 </head>
 <body>
     <h1>{{ album }}</h1>
-    <h1> Albums </h1>
 
-    {% if albums %}
-        {% for album in albums %}
+    {% if album %}
+        {% for eachalbum in album %}
         <li><a href="/view_album/{{user[0]}}"> {{album[1] + ' ' + album[2]}} </a></li>
         {% endfor %}
     {% endif %}
+
+
+    {% if photos %}
+    {# causing photos not to appear for some reason?  #}
+      <img src={{ photopath }}>
+    {# for testing, but following line also doens't work  #}
+{#     <img src="../uploads/img2.png"> #}
+{% endif %}
 
     <div class="nav">
         <a href='/search'>Search</a>
