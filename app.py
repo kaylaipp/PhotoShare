@@ -28,8 +28,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -183,8 +183,8 @@ def listalbums(uid):
                      "FROM Albums " \
                      "WHERE  "\
                      "albumOwner = '{0}'".format(uid) #
-
-    cursor = conn.cursor()
+    # albumnames = "SELECT name FROM Albums WHERE albumOwner = '{0}'".format(uid)
+    # cursor = conn.cursor()
 
     albumnames = cursor.execute(albumnames)
     albumnames = cursor.fetchall()
@@ -193,7 +193,7 @@ def listalbums(uid):
     for name in albumnames:
         name = str(name)
         converted.append(name[3:-3])
-    #return albumnames
+    print(albumnames)
 
     return converted
 
@@ -274,7 +274,7 @@ def isEmailUnique(email):
 def isAlbumNameUnique(name,uid):
 
     cursor = conn.cursor()
-    if cursor.execute("SELECT name FROM Album WHERE name = '{0}' AND albumOwner = '{1}'".format(name,uid)):
+    if cursor.execute("SELECT name FROM Albums WHERE name = '{0}' AND albumOwner = '{1}'".format(name,uid)):
         # this means there are greater than zero entries with that album_title
         return False
     else:
@@ -319,6 +319,16 @@ def deletePhoto(photoID):
     cursor.execute("DELETE FROM Photos WHERE photoid='{0}'".format(photoID))
     conn.commit()
 
+#delete albums
+@app.route("/deletealbum/<album>", methods=['GET'])
+@flask_login.login_required
+def delete_album(album):
+        uid=getUserIdFromEmail(flask_login.current_user.id)
+        cursor=conn.cursor()
+        albumid = getAlbumID(uid, album)
+        cursor.execute("DELETE FROM Albums WHERE albumOwner='{0}' AND albumID='{1}'".format(uid,albumid))
+        conn.commit()
+        return render_template('view_album.html', message='Album deleted!')
 
 
 #display your friends on your profile page
@@ -330,6 +340,7 @@ def displayFriends():
             uid)
     cursor.execute(query)
     friends = cursor.fetchall()
+    print('friend count: ', len(friends))
     #print('friends: ', friends)
     return render_template('friends.html', friends = friends, message = "Your Friends")
 
@@ -339,14 +350,18 @@ def friendcount(uid):
     #count = "SELECT count(distinct(userID1 + userID2))" \
     #       "FROM Friends " \
     #       "WHERE userID1 OR userID2 = '{0}'".format(uid)
-
-    count = "SELECT count(distinct(userID2))" \
-            "FROM Friends " \
-            "WHERE userID1 = '{0}'".format(uid)
-    cursor.execute(count)
-    count = cursor.fetchall()
+    query = "SELECT U.firstname,U.lastname from Users U, Friends F where F.userID1='{0}' AND F.userID2=U.user_id OR F.userID2='{0}' AND F.userID1=U.user_id".format(
+        uid)
+    # count = "SELECT count(distinct(userID2))" \
+    #         "FROM Friends " \
+    #         "WHERE userID1 = '{0}'".format(uid)
+    cursor.execute(query)
+    friends = cursor.fetchall()
+    print('friend count: ', len(friends))
+    count = len(friends)
     print('count: ', str(count))
-    return str(count)[2:-4] #this was giving me count:  ((1,),) so i converted to string and sliced it
+    #return str(count)[2:-4] #this was giving me count:  ((1,),) so i converted to string and sliced it
+    return count
 
 #@app.route('/search',methods=['GET','POST'])
 #@flask_login.login_required
@@ -413,6 +428,11 @@ def search_friends():
         return render_template('search.html', message="No results found, "
                                                                    "please enter first and last"
                                                                    "name")
+    #if the case person searched doesn't exist
+    except TypeError:
+        return render_template('search.html', message="No users found, please try again")
+
+
 #Should return USERS that created comments that match search
 #return users ordered by number of comments
 #that match the query for each user in descending order
@@ -502,8 +522,8 @@ def create_album():
     else:
         return render_template('new_album.html', supress = True)
 
-# Problems: doesn't store imgdata for some reason under python 2.7 and 3
-# also doesn't show photos on profile at all. Even with correect pathname
+# Problems: doesn't store imgdata for some reason under python 2.7
+# also doesn't show photos on profile at all. Even with correct pathname
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
@@ -521,7 +541,7 @@ def upload_file():
         filename = Uploads + uploadfile.filename
         cursor = conn.cursor()
 
-        print('upload photo path/filename: ',filename)
+        print('upload photo full filename: ',filename)
 
         #to save photos to upload folder
         uploadfile.save(os.path.join(app.config['Uploads'], filename))
@@ -586,7 +606,6 @@ def upload_file():
         # img.write(base64.decodestring(photo_data))
         # print('upload_photo: ', photo_data)
 
-
         conn.commit()
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',photos=getUsersPhotos(uid))
     # The method is GET so we return a  HTML form to upload the a photo.
@@ -597,8 +616,6 @@ def upload_file():
 
 #Trying to display photos on profile
 #not completely working yet, getting blue boxes
-#^ I'm not even getting those
-# @yuta, the blue boxes don't show on chrome, but it shows on safari i believe
 @app.route('/profile', methods=['GET'])
 def showPhotos():
     uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -613,11 +630,9 @@ def showPhotos():
         print("[line 462 in showPhotos()] photopath is ",path[3:-7]) ####################################
         converted.append(path[3:-7])
     #take brackets off of final list
-    #converted = str(converted)[1:-1]
     print('showPhotos(): ', converted)
     return converted
-    #print('photopath: ',photopath)
-    #return render_template('profile.html', photopath = "../uploads/img1.png")
+
 
 #return friend recommendations
 # @flask_login.login_required
@@ -644,10 +659,12 @@ def showPhotos():
 
 @app.route('/all/<tag>', methods=['GET'])
 def search_tags(tag):
-    tagged = getTaggedPhotos(tag)
-    uid = getUserIdFromEmail(flask_login.current_user.id)
-    return render_template('search.html', photos=tagged,
-                           message="Here are all photos tagged with: " + tag)
+    if(len(tag)!= 0):
+        tagged = getTaggedPhotos(tag)
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        return render_template('search.html', photos=tagged,
+                               message="Here are all photos tagged with: " + tag)
+
 
 # default page
 @app.route("/", methods=['GET'])
