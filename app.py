@@ -160,7 +160,7 @@ def listalbums(uid):
     cursor = conn.cursor()
     unsorted_count = "SELECT COUNT(photoid) FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
     unsorted_count = cursor.execute(unsorted_count)
-
+    # This hides the album "unsorted" if there are no photos in it
     if (unsorted_count <= 1):
         albumnames = "SELECT name " \
                  "FROM Albums " \
@@ -257,6 +257,15 @@ def isEmailUnique(email):
     cursor = conn.cursor()
     if cursor.execute("SELECT email  FROM Users WHERE email = '{0}'".format(email)):
         # this means there are greater than zero entries with that email
+        return False
+    else:
+        return True
+
+def isAlbumNameUnique(name,uid):
+
+    cursor = conn.cursor()
+    if cursor.execute("SELECT name FROM Album WHERE name = '{0}' AND albumOwner = '{1}'".format(name,uid)):
+        # this means there are greater than zero entries with that album_title
         return False
     else:
         return True
@@ -468,10 +477,12 @@ def allowed_file(filename):
 @flask_login.login_required
 def create_album():
     if request.method == 'POST':
-        if (True):
+        albumName = request.form.get('album_title')
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        if isAlbumNameUnique(albumName,uid):
             cursor = conn.cursor()
             uid = getUserIdFromEmail(flask_login.current_user.id)
-            albumName = request.form.get('album_title')
+            #albumName = request.form.get('album_title')
             date = time.strftime("%Y-%m-%d")
             cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
             conn.commit()
