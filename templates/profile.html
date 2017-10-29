@@ -42,7 +42,7 @@
 {#problem lies here! #}
 {% if photopath %}
     {% for photo in photopath %}
-        
+
         <img src="../static/uploads/{{ photo }}">
 
     {% endfor %}
@@ -60,16 +60,6 @@
 
 
 
-{#not using this method anymore, see photopath above#}
-{#{% if photos %}#}
-{#<h2>Here's your photos</h2>#}
-{#   <ul>#}
-{#   {% for photo in photos %}#}
-{#       <li><a href = '/albums?photo_id={{photo[2]}}'>caption: {{photo[1]}} photo id: {{photo[2]}}</a></li>#}
-{#       <li><img src='data:image/png;base64, {{photo[0]}}'/></li>#}
-{#   {% endfor %}#}
-{#   </ul>#}
-{#{% endif %}#}
 
 {#display top tags #}
 {% if tags %}

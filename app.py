@@ -174,7 +174,7 @@ def listalbums(uid):
     unsorted_count = "SELECT COUNT(photoid) FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
     unsorted_count = cursor.execute(unsorted_count)
     # This hides the album "unsorted" if there are no photos in it
-    if (unsorted_count <= 1):
+    if (unsorted_count < 1):
         albumnames = "SELECT name " \
                  "FROM Albums " \
                  "WHERE  name != 'unsorted' AND "\
@@ -391,6 +391,7 @@ def protected():
     albumnames = listalbums(user)
     numberfriends = friendcount(user)
     taglist = getTopTags()
+    print("albumnames line 619", albumnames)###################
     return render_template('profile.html', name=flask_login.current_user.id,
                            firstname=name, albumname = albumnames,
                            photopath = photopath, numberfriends = numberfriends, tags = taglist)
@@ -616,10 +617,10 @@ def upload_file():
     else:
 
         albumnames = listalbums(getUserIdFromEmail(flask_login.current_user.id))
+
         return render_template('upload.html', albumname=albumnames)
 
-#Trying to display photos on profile
-#not completely working yet, getting blue boxes
+
 @app.route('/profile', methods=['GET'])
 def showPhotos():
     uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -631,7 +632,7 @@ def showPhotos():
     converted = []
     for path in photopath:
         path = str(path)
-        print("[line 462 in showPhotos()] photopath is ",path[3:-3]) ####################################
+        #print("[line 462 in showPhotos()] photopath is ",path[3:-3]) ####################################
         converted.append(path[3:-3])                                  #### tried changing slice to include ext
     #take brackets off of final list
     print('showPhotos(): ', converted)
