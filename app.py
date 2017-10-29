@@ -29,8 +29,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -168,6 +168,7 @@ def listalbums():
         name = str(name)
         converted.append(name[3:-3])
     #return albumnames
+    print(converted)  ###################################
     return converted
 
 @app.route('/view_album')
@@ -240,6 +241,25 @@ def isEmailUnique(email):
     else:
         return True
 
+def isAlbumTitleUnique(name):
+    #name = name.lower() I think mysql is non case sensitive so nvm this line
+    cursor = conn.cursor()
+    if cursor.execute("SELECT name FROM Albums WHERE name = '{0}'".format(name)):
+        return False
+    else:
+        return True
+
+def deletePhotos(photo_id):
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Likes where picture_id = '{0}'".format(photo_id))
+    conn.commit()
+    cursor.execute("DELETE FROM Belongs_To WHERE picture_id='{0}'".format(photo_id))
+    conn.commit()
+    cursor.execute("DELETE FROM Has_Comment WHERE picture_id='{0}'".format(photo_id))
+    conn.commit()
+    cursor.execute("DELETE FROM Photos WHERE picture_id='{0}'".format(photo_id))
+    conn.commit()
+
 #display your friends on your profile page ~not working yet~
 @app.route('/friends', methods=['GET'])
 def displayFriends():
@@ -293,7 +313,7 @@ def protected():
     albumnames = listalbums()
     numberfriends = friendcount(user)
     return render_template('profile.html', name=flask_login.current_user.id,
-                           firstname=name, albumname = albumnames, albums=album,
+                           firstname=name, albumname = albumnames, 
                            photopath = photopath, numberfriends = numberfriends)
 
 # begin photo uploading code
@@ -405,9 +425,12 @@ def create_album():
             uid = getUserIdFromEmail(flask_login.current_user.id)
             albumName = request.form.get('album_title')
             date = time.strftime("%Y-%m-%d")
-            cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
-            conn.commit()
-            return render_template('new_album.html', message='Album Created!', supress = False)#albums=getUsersAlbums(uid))
+            if (isAlbumTitleUnique(albumName)):
+                cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
+                conn.commit()
+                return render_template('new_album.html', message='Album Created!', supress = False)#albums=getUsersAlbums(uid))
+            else:
+                return render_template('new_album.html', message="Album title already taken! Choose another", supress = True)
         else:
             return render_template('new_album.html', message="Choose an album title", supress = True)
     else:
@@ -416,8 +439,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads'
+    # Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/uploads'
     app.config['Uploads'] = Uploads
     if request.method == 'POST':
         uid = getUserIdFromEmail(flask_login.current_user.id)
