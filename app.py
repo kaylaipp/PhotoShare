@@ -28,8 +28,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -89,7 +89,7 @@ def new_page_function():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if flask.request.method == 'GET':
-        return render_template('login.html')
+        return render_template('login.html', suppress = True)
     # The request method is POST (page is recieving data)
     email = flask.request.form['email']
     cursor = conn.cursor()
@@ -104,8 +104,7 @@ def login():
             return flask.redirect(flask.url_for('protected'))  # protected is a function defined in this file
 
     # information did not match
-    return "<a href='/login'>Try again</a>\
-			</br><a href='/register'>or make an account</a>"
+    return  render_template('login.html', suppress = False)
 
 
 @app.route('/logout')
@@ -155,11 +154,26 @@ def register_user():
         return render_template('register.html', supress=False)
 
 #to list names of albums on user profile page
-def listalbums():
-    uid = getUserIdFromEmail(flask_login.current_user.id)
+
+def listalbums(uid):
+
     cursor = conn.cursor()
-    albumnames = "SELECT name " \
-                 "FROM Albums WHERE albumOwner = '{0}'".format(uid)
+    unsorted_count = "SELECT COUNT(photoid) FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
+    unsorted_count = cursor.execute(unsorted_count)
+    # This hides the album "unsorted" if there are no photos in it
+    if (unsorted_count <= 1):
+        albumnames = "SELECT name " \
+                 "FROM Albums " \
+                 "WHERE  name != 'unsorted' AND "\
+                 "albumOwner = '{0}'".format(uid)
+    else:
+        albumnames = "SELECT name " \
+                     "FROM Albums " \
+                     "WHERE  "\
+                     "albumOwner = '{0}'".format(uid) #
+
+    cursor = conn.cursor()
+
     albumnames = cursor.execute(albumnames)
     albumnames = cursor.fetchall()
     #cursor.fetchall()
@@ -247,6 +261,15 @@ def isEmailUnique(email):
     else:
         return True
 
+def isAlbumNameUnique(name,uid):
+
+    cursor = conn.cursor()
+    if cursor.execute("SELECT name FROM Album WHERE name = '{0}' AND albumOwner = '{1}'".format(name,uid)):
+        # this means there are greater than zero entries with that album_title
+        return False
+    else:
+        return True
+
 def getUsersFriends(uid):
     cursor = conn.cursor()
     cursor.execute("SELECT user_id2 FROM Friends_with WHERE user_id1 = '{0}'".format(uid))
@@ -271,6 +294,22 @@ def getTaggedPhotos(tag_word):
     photos = cursor.fetchall()
     print(photos)
     return photos
+
+# need to find a way to link this up to everything else but should work
+def deletePhoto(photoID):
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Has_Comment where photoid = '{0}'".format(photoID))
+    conn.commit()
+    cursor.execute("DELETE FROM Likes where photoID = '{0}'".format(photoID))
+    conn.commit()
+    cursor.execute("DELETE FROM Has_Tag WHERE photoid='{0}'".format(photoID))
+    conn.commit()
+    cursor.execute("DELETE FROM Belongs_To WHERE photoID='{0}'".format(photoID))
+    conn.commit()
+    cursor.execute("DELETE FROM Photos WHERE photoid='{0}'".format(photoID))
+    conn.commit()
+
+
 
 #display your friends on your profile page
 @app.route('/friends', methods=['GET'])
@@ -321,7 +360,7 @@ def protected():
     uid = getNameFromEmail(flask_login.current_user.id)
     photos = getUsersPhotos(user)
     photopath = showPhotos()
-    albumnames = listalbums()
+    albumnames = listalbums(getUserIdFromEmail(flask_login.current_user.id))
     numberfriends = friendcount(user)
     taglist = getTopTags()
     return render_template('profile.html', name=flask_login.current_user.id,
@@ -438,10 +477,12 @@ def allowed_file(filename):
 @flask_login.login_required
 def create_album():
     if request.method == 'POST':
-        if (True):
+        albumName = request.form.get('album_title')
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        if isAlbumNameUnique(albumName,uid):
             cursor = conn.cursor()
             uid = getUserIdFromEmail(flask_login.current_user.id)
-            albumName = request.form.get('album_title')
+            #albumName = request.form.get('album_title')
             date = time.strftime("%Y-%m-%d")
             cursor.execute("INSERT INTO Albums(name, albumOwner, datecreated) VALUES('{0}', '{1}', '{2}')".format(albumName,uid,date))
             conn.commit()
@@ -541,7 +582,7 @@ def upload_file():
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
 
-        albumnames = listalbums()
+        albumnames = listalbums(getUserIdFromEmail(flask_login.current_user.id))
         return render_template('upload.html', albumname=albumnames)
 
 #Trying to display photos on profile
