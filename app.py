@@ -330,6 +330,7 @@ def displayFriends():
             uid)
     cursor.execute(query)
     friends = cursor.fetchall()
+    print('friend count: ', len(friends))
     #print('friends: ', friends)
     return render_template('friends.html', friends = friends, message = "Your Friends")
 
@@ -339,14 +340,18 @@ def friendcount(uid):
     #count = "SELECT count(distinct(userID1 + userID2))" \
     #       "FROM Friends " \
     #       "WHERE userID1 OR userID2 = '{0}'".format(uid)
-
-    count = "SELECT count(distinct(userID2))" \
-            "FROM Friends " \
-            "WHERE userID1 = '{0}'".format(uid)
-    cursor.execute(count)
-    count = cursor.fetchall()
+    query = "SELECT U.firstname,U.lastname from Users U, Friends F where F.userID1='{0}' AND F.userID2=U.user_id OR F.userID2='{0}' AND F.userID1=U.user_id".format(
+        uid)
+    # count = "SELECT count(distinct(userID2))" \
+    #         "FROM Friends " \
+    #         "WHERE userID1 = '{0}'".format(uid)
+    cursor.execute(query)
+    friends = cursor.fetchall()
+    print('friend count: ', len(friends))
+    count = len(friends)
     print('count: ', str(count))
-    return str(count)[2:-4] #this was giving me count:  ((1,),) so i converted to string and sliced it
+    #return str(count)[2:-4] #this was giving me count:  ((1,),) so i converted to string and sliced it
+    return count
 
 #@app.route('/search',methods=['GET','POST'])
 #@flask_login.login_required
@@ -413,6 +418,11 @@ def search_friends():
         return render_template('search.html', message="No results found, "
                                                                    "please enter first and last"
                                                                    "name")
+    #if the case person searched doesn't exist
+    except TypeError:
+        return render_template('search.html', message="No users found, please try again")
+
+
 #Should return USERS that created comments that match search
 #return users ordered by number of comments
 #that match the query for each user in descending order
@@ -639,10 +649,12 @@ def showPhotos():
 
 @app.route('/all/<tag>', methods=['GET'])
 def search_tags(tag):
-    tagged = getTaggedPhotos(tag)
-    uid = getUserIdFromEmail(flask_login.current_user.id)
-    return render_template('search.html', photos=tagged,
-                           message="Here are all photos tagged with: " + tag)
+    if(len(tag)!= 0):
+        tagged = getTaggedPhotos(tag)
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        return render_template('search.html', photos=tagged,
+                               message="Here are all photos tagged with: " + tag)
+
 
 # default page
 @app.route("/", methods=['GET'])

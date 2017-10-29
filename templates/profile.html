@@ -62,6 +62,10 @@
 
 {#display top tags #}
 {% if tags %}
+    <form method="post" action="all/{{ t }}">
+     <label for="tag_word">Find photos by tag:</label>
+     <input type="tag_word" name="tag_word" /><br />
+</form>
 <h3> Top 5 tags </h3>
      {% for t in tags %}
          <li><a href='/all/{{t}}'>{{t}}</a> </li>
@@ -71,12 +75,8 @@
 {% if message is none %}
   <p>You should <a href='/login'>login!</a></p>
 {% endif %}
-<img src = "../uploads/img3.png">
+{#<img src = "../uploads/img3.png">#}
 
-{#<form method="post" action="{{ url_for('search_tags') }}">#}
-{#     <label for="tag_word">Find photos by tag:</label>#}
-{#     <input type="tag_word" name="tag_word" /><br />#}
-{#</form>#}
 
 <div class = 'profilenav'>
     <ul>
