@@ -22,7 +22,7 @@
     {% if photos %}
     {# causing photos not to appear for some reason?  #}
         {%  for eachPhoto in photos %}
-      <img src={{ eachPhoto }}>
+      <img src="{{ eachPhoto }}">
         {% endfor %}
     {# for testing, but following line also doens't work  #}
 {#     <img src="../uploads/img2.png"> #}
