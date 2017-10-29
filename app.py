@@ -89,7 +89,7 @@ def new_page_function():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if flask.request.method == 'GET':
-        return render_template('login.html')
+        return render_template('login.html', suppress = True)
     # The request method is POST (page is recieving data)
     email = flask.request.form['email']
     cursor = conn.cursor()
@@ -104,8 +104,7 @@ def login():
             return flask.redirect(flask.url_for('protected'))  # protected is a function defined in this file
 
     # information did not match
-    return "<a href='/login'>Try again</a>\
-			</br><a href='/register'>or make an account</a>"
+    return render_template('login.html', suppress=False)
 
 
 @app.route('/logout')
@@ -146,20 +145,44 @@ def register_user():
                               firstname, lastname,username,DOB)))
         conn.commit()
         # log user in
+
         user = User()
         user.id = email
         flask_login.login_user(user)
-        return render_template('profile.html', name=firstname, message='Account Created!')
+
+        # Create unsorted album for photos not yet belonging to an album
+        albumOwner = getUserIdFromEmail(flask_login.current_user.id)
+        name = "unsorted"
+        date = time.strftime("%Y-%m-%d")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO Albums (albumOwner, name, datecreated,albumID)"
+                       "VALUES ('{0}', '{1}','{2}',1)".format(albumOwner, name, date))
+        conn.commit()
+        return flask.redirect(flask.url_for('protected'))
+
     else:
         print("couldn't find all tokens")
         return render_template('register.html', supress=False)
 
 #to list names of albums on user profile page
-def listalbums():
-    uid = getUserIdFromEmail(flask_login.current_user.id)
+def listalbums(uid):
+
     cursor = conn.cursor()
-    albumnames = "SELECT name " \
-                 "FROM Albums WHERE albumOwner = '{0}'".format(uid)
+    unsorted_count = "SELECT COUNT(photoid) FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
+    unsorted_count = cursor.execute(unsorted_count)
+
+
+    if (unsorted_count <= 1):
+        albumnames = "SELECT name " \
+                 "FROM Albums " \
+                 "WHERE  name != 'unsorted' AND "\
+                 "albumOwner = '{0}'".format(uid)
+    else:
+        albumnames = "SELECT name " \
+                     "FROM Albums " \
+                     "WHERE  "\
+                     "albumOwner = '{0}'".format(uid) #
+    cursor = conn.cursor()
     albumnames = cursor.execute(albumnames)
     albumnames = cursor.fetchall()
     #cursor.fetchall()
@@ -247,6 +270,16 @@ def isEmailUnique(email):
     else:
         return True
 
+def isAlbumNameUnique(name):
+    #use this to check if an album is unique to the user
+    user = getUserIdFromEmail(flask_login.current_user.id)
+    cursor = conn.cursor()
+    if cursor.execute("SELECT S.name FROM Albums S   WHERE S.albumOwner = user AND name = '{0}'".format(email)):
+        # this means there are greater than zero entries with that name
+        return False
+    else:
+        return True
+
 #display your friends on your profile page ~not working yet~
 @app.route('/friends', methods=['GET'])
 def displayFriends():
@@ -296,7 +329,7 @@ def protected():
     uid = getNameFromEmail(flask_login.current_user.id)
     photos = getUsersPhotos(user)
     photopath = showPhotos()
-    albumnames = listalbums()
+    albumnames = listalbums(user)
     numberfriends = friendcount(user)
     return render_template('profile.html', name=flask_login.current_user.id,
                            firstname=name, albumname = albumnames,
@@ -446,8 +479,8 @@ def upload_file():
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',photos=getUsersPhotos(uid))
     # The method is GET so we return a  HTML form to upload the a photo.
     else:
-
-        albumnames = listalbums()
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        albumnames = listalbums(uid)
         return render_template('upload.html', albumname=albumnames)
 
 

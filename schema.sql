@@ -15,7 +15,7 @@ CREATE TABLE Users (
 CREATE TABLE Albums
 (
   albumID INT AUTO_INCREMENT, albumOwner INT, name VARCHAR(30), datecreated DATE,
-  PRIMARY KEY(albumID),
+  PRIMARY KEY(albumID,albumOwner),
   FOREIGN KEY(albumOwner) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
@@ -108,8 +108,4 @@ CREATE TABLE Likes
   FOREIGN KEY(photoID) REFERENCES Photos(photoID) ON DELETE CASCADE
 );
 
-
-INSERT INTO Users (firstname, lastname,username, email, password)
-VALUES ('Yuta', 'Takano','test2','test2@bu.edu', 'test');
-INSERT INTO Users (email, password) VALUES ('test1@bu.edu', 'test');
 

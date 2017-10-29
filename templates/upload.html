@@ -18,16 +18,17 @@
                 <input type="text" name="caption"  /><br />
 
 
+                Choose album upload into: <select name="album">
+                     <option value="unsorted">Decide Later</option>
                 {% if albumname %}
-                 Choose album upload into: <select name="album">
-                    <option value="unsorted">Decide Later</option>
                     {%  for album in albumname %}
                     <option value="{{ album }}">{{ album }}</option>
                     {%  endfor %}
-
-                </select>
                 {% endif %}
+                </select>
+
                 <br />
                 <input type="submit" value="Upload" />
+
             </form>
     </body>
