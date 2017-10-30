@@ -78,14 +78,4 @@ div.caption{
     left: 38%
 }
 
-ls a {
-    display: block;
-    color: black;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
 
-ls a:hover {
-    background-color: #ffff00;
-}

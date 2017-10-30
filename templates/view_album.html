@@ -7,41 +7,42 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <meta charset="UTF-8">
     <title>View Album</title>
+
 <style>
-{#ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
-}
 
-li {
-    float: left;
-}
+#nav {
 
-li a {
-    display: block;
-    color: white;
-    text-align: center;
+}
+#nav ul{
+    position:fixed;
+    top:0;
+    width:100%;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background-color:#333;
+}
+#nav li{
+    float:left;
+}
+#nav li a{
+    display:block;
+    color:white;
+    text-align:center;
     padding: 14px 16px;
-    text-decoration: none;
+    text-decoration:none;
+}
+#nav li a:focus,li a:hover {
+
+    background-color: #111;
 }
 
-li a:hover {
-    background-color: #111;
-}#}
 </style>
 
 </head>
 <body>
-   <ul>
-    <div class="nav">
-        <li><a href='/profile'>Profile</a></li>
-        <li><a href='/search'>Search</a></li>
-        <li><a href='/logout'>Logout</a></li>
-    </div>
-    </ul>
+
 
 
   <h1>{{ album }}</h1>
@@ -67,6 +68,12 @@ li a:hover {
 
     {% endfor %}
 {% endif %}
-
+  <div id="nav">
+   <ul>
+        <li><a href='/profile'>Profile</a></li>
+        <li><a href='/search'>Search</a></li>
+        <li><a href='/logout'>Logout</a></li>
+    </ul>
+      </div>
 </body>
 </html>
