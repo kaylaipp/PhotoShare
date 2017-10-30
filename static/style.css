@@ -1,9 +1,10 @@
 h1,h2,h3,h4,h5{
     text-align: center;
 }
+
 .centerbuttons{
     position: relative;
-    left:33%;
+    left: 23%;
 }
 
 html, body {
