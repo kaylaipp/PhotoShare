@@ -244,6 +244,9 @@ def add_comment(album,photo):
             uid = 1
         photoOwner = getPhotoOwnerID(photo)
 
+        if uid == photoOwner:
+            return flask.redirect(flask.url_for('browse'))
+
         date = time.strftime("%Y-%m-%d")
         comment = request.form.get('comment')
         test = isCommentUnique(comment)
