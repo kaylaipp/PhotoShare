@@ -224,14 +224,23 @@ def view_album():
         try:
             uid = getUserIdFromEmail(flask_login.current_user.id)
             albumid = getAlbumID(uid,album)
-            print(albumid)  ############################################### this isnt't working
             photos = getPhotosFromAlbum(uid,albumid)
-            print(photos) ############################################### this isnt't working
+
         except:
             print("couldn't find all tokens")
             #return render_template('view_album.html', album=albumname, albumid = album[1])
             return render_template('view_album.html', album=album, albumid=albumid)
-        return render_template('view_album.html', album = album, photopath = photos, albumid = album)
+        try:
+            comments = []
+            for each in photos:
+                    comments += [getCommentForPicture(each[1])]
+        except:
+            print("couldn't find all comments")
+            return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
+        return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
+    #elif flask.request.method == "GET":
+
+
 
 
 
@@ -245,9 +254,16 @@ def getUsersPhotos(uid):
 
 def getPhotosFromAlbum(uid,albumid):
     cursor = conn.cursor()
-    cursor.execute("SELECT photopath, photoid, caption FROM Photos \
-                    WHERE Photos.user_id = '{0}' AND Photos.album_id = '{1}'".format(uid,albumid))
+    cursor.execute("SELECT S.photopath, S.photoid, S.caption FROM Photos S \
+                    WHERE S.user_id = '{0}' AND S.album_id = '{1}'".format(uid,albumid))
+
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
+
+def getCommentForPicture(photoid):
+    cursor = conn.cursor()
+    cursor.execute("SELECT S.text,S.date,Q.firstname,Q.lastname FROM Comments S LEFT JOIN Has_Comment R ON S.commentID = R.commentID LEFT JOIN Users Q ON Q.user_id = S.userID\
+                    WHERE Q.user_id = S.userID AND R.photoid = '{0}'.format(photoid)")
+    return cursor.fetchall()
 
 def getUsersAlbums(uid):
     cursor = conn.cursor()
@@ -277,6 +293,14 @@ def isEmailUnique(email):
     # use this to check if a email has already been registered
     cursor = conn.cursor()
     if cursor.execute("SELECT email  FROM Users WHERE email = '{0}'".format(email)):
+        # this means there are greater than zero entries with that email
+        return False
+    else:
+        return True
+
+def isCommentUnique(comment):
+    cursor=conn.cursor()
+    if cursor.execute("SELECT text FROM Comments WHERE text = '{0}'".format(comment)):
         # this means there are greater than zero entries with that email
         return False
     else:
@@ -322,7 +346,20 @@ def getTaggedPhotos(tag_word):
     print(photos)
     return photos
 
+def getCommentIDFromText(comment_text):
+    cursor = conn.cursor
+    cursor.execute("SELECT S.commentID FROM Comments S WHERE S.text = '{0}'".format(comment_text))
+    return cursor.fetchall()
 
+def insertComment(comment_text,uid,date):
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Comments(text, userID, date) VALUES('{0}','{1}','{2}')".format(comment_text, uid, date))
+    conn.commit()
+
+def insertHasComment(commentID, photoid):
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Has_Comment(commentID, photoid) VALUES('{0}','{1}')".format(commentID, photoid))
+    conn.commit()
 
 #delete albums
 @app.route("/deletealbum/<album>", methods=['GET'])
@@ -570,7 +607,7 @@ def create_album():
         return render_template('new_album.html', supress = True)
 
 # Problems: doesn't store imgdata for some reason under python 2.7
-# also doesn't show photos on profile at all. Even with correct pathname
+
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
