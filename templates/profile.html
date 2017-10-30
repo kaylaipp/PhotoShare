@@ -112,12 +112,10 @@ ul{
 {#     <input type="tag_word" name="tag_word" /><br />#}
 {#</form>#}
 
-
 <h3> Top 5 tags </h3>
      {% for t in tags %}
-
-         <ul><li><a href='/all/{{t}}'>{{t}}</a> </li></ul>
-
+{#         <ul><li><a href='/all/{{t}}'>{{t}}</a> </li></ul>#}
+         <ul><li><a href='/searchtags/{{t}}'>{{t}}</a> </li></ul>
      {% endfor %}
 {% endif %}
 
