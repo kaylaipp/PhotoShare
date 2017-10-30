@@ -212,51 +212,60 @@ def listalbums(uid):
 # def albumpageview():
 # 	return render_template('view_album.html')
 
-@app.route("/view_album/<album>")
-def view_album(album):
-        try:
-            uid = getUserIdFromEmail(flask_login.current_user.id)
-            albumid = getAlbumID(uid,album)
-            photos = getPhotosFromAlbum(uid,albumid)
+# @app.route("/view_album/<album>", methods=['GET', 'POST'])
+# def view_album(album):
+#         try:
+#             uid = getUserIdFromEmail(flask_login.current_user.id)
+#             albumid = getAlbumID(uid,album)
+#             photos = getPhotosFromAlbum(uid,albumid)
+#
+#         except:
+#             print("couldn't find all tokens")
+#             return render_template('view_album.html', album=album, albumid=albumid)
+#         try:
+#             comments = []
+#             for each in photos:
+#                     comments += [getCommentForPicture(each[1])]
+#         except:
+#             print("couldn't find all comments")
+#             return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
+#         return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
+# if flask.request.method == 'POST':
+#     comment = request.form.get('comment')
+#     test = isCommentUnique(comment)
+#     if test:
 
-        except:
-            print("couldn't find all tokens")
-            return render_template('view_album.html', album=album, albumid=albumid)
-        try:
-            comments = []
-            for each in photos:
-                    comments += [getCommentForPicture(each[1])]
-        except:
-            print("couldn't find all comments")
-            return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
-        return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
 
-def view_album():
-    if flask.request.method == 'POST':
-        #getUserNameUid(flask_login.current_user.id)
-        album = request.form.get('album')
-        album = str(album)
 
-        try:
-            uid = getUserIdFromEmail(flask_login.current_user.id)
-            albumid = getAlbumID(uid,album)
-            photos = getPhotosFromAlbum(uid,albumid)
+#
+# def view_album():
+#     if flask.request.method == 'POST':
+#         #getUserNameUid(flask_login.current_user.id)
+#         album = request.form.get('album')
+#         album = str(album)
+#
+#         try:
+#             uid = getUserIdFromEmail(flask_login.current_user.id)
+#             albumid = getAlbumID(uid,album)
+#             photos = getPhotosFromAlbum(uid,albumid)
+#
+#         except:
+#             print("couldn't find all tokens")
+#             #return render_template('view_album.html', album=albumname, albumid = album[1])
+#             return render_template('view_album.html', album=album, albumid=albumid)
+#         try:
+#             comments = []
+#             for each in photos:
+#                     comments += [getCommentForPicture(each[1])]
+#         except:
+#             print("couldn't find all comments")
+#             return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
+#         return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
+#     #elif flask.request.method == "GET":
 
-        except:
-            print("couldn't find all tokens")
-            #return render_template('view_album.html', album=albumname, albumid = album[1])
-            return render_template('view_album.html', album=album, albumid=albumid)
-        try:
-            comments = []
-            for each in photos:
-                    comments += [getCommentForPicture(each[1])]
-        except:
-            print("couldn't find all comments")
-            return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
-        return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
-    #elif flask.request.method == "GET":
+#@app.route("/view_album/<album>/<picture>", methods=['GET', 'POST'])
+#if flask.request.method == 'POST':
 
-@app.route("/view_album", methods=['GET', 'POST'])
 
 
 
@@ -399,10 +408,10 @@ def delete_album(album):
 
 
 #delete pictures
-@app.route("/deletepicture/<photoID>", methods=['GET'])
+@app.route("/deletepicture/<album>/<photoID>", methods=['GET'])
 @flask_login.login_required
-# need to find a way to link this up to everything else but should work
-def deletePhoto(photoID):
+
+def deletePhoto(photoID,album):
     cursor = conn.cursor()
     cursor.execute("DELETE FROM Has_Comment where photoid = '{0}'".format(photoID))
     conn.commit()
@@ -415,19 +424,9 @@ def deletePhoto(photoID):
     cursor.execute("DELETE FROM Photos WHERE photoid='{0}'".format(photoID))
     conn.commit()
     email = flask_login.current_user.id
-    name = getNameFromEmail(email)
-    user = getUserIdFromEmail(email)
-    #uid = getNameFromEmail(email)
-    #photos = getUsersPhotos(user)
-    photopath = showPhotos()
     message = "Picture deleted!"
-    albumnames = listalbums(user)
-    numberfriends = friendcount(user)
-    taglist = getTopTags()
 
-    return render_template('profile.html', name=flask_login.current_user.id,
-                           firstname=name, albumname = albumnames,
-                           photopath = photopath, numberfriends = numberfriends, tags = taglist, message = message)
+    return flask.redirect(flask.url_for('view_album',album=album))
 
 #display your friends on your profile page
 @app.route('/friends', methods=['GET'])
