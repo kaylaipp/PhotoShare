@@ -31,9 +31,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#
-# app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -213,28 +212,28 @@ def listalbums(uid):
 # def albumpageview():
 # 	return render_template('view_album.html')
 
-# @app.route("/view_album/<album>", methods=['GET', 'POST'])
-# def view_album(album):
-#         try:
-#             uid = getUserIdFromEmail(flask_login.current_user.id)
-#             albumid = getAlbumID(uid,album)
-#             photos = getPhotosFromAlbum(uid,albumid)
-#
-#         except:
-#             print("couldn't find all tokens")
-#             return render_template('view_album.html', album=album, albumid=albumid)
-#         try:
-#             comments = []
-#             for each in photos:
-#                     comments += [getCommentForPicture(each[1])]
-#         except:
-#             print("couldn't find all comments")
-#             return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
-#         return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
-# if flask.request.method == 'POST':
-#     comment = request.form.get('comment')
-#     test = isCommentUnique(comment)
-#     if test:
+@app.route("/view_album/<album>", methods=['GET', 'POST'])
+def view_album(album):
+        try:
+            uid = getUserIdFromEmail(flask_login.current_user.id)
+            albumid = getAlbumID(uid,album)
+            photos = getPhotosFromAlbum(uid,albumid)
+
+        except:
+            print("couldn't find all tokens")
+            return render_template('view_album.html', album=album, albumid=albumid)
+        try:
+            comments = []
+            for each in photos:
+                    comments += [getCommentForPicture(each[1])]
+        except:
+            print("couldn't find all comments")
+            return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
+        return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
+#if flask.request.method == 'POST':
+#    comment = request.form.get('comment')
+#    test = isCommentUnique(comment)
+    #if test:
 
 
 
@@ -636,8 +635,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -812,7 +811,7 @@ def searchtags():
 
     photopaths = []
     for tag in name:
-        photopath = "SELECT photopath FROM PHOTOS P " \
+        photopath = "SELECT photopath FROM Photos P " \
                     "JOIN Has_Tag H on H.photoId = P.photoID JOIN Tags T on T.tagID = H.tagID " \
                     "WHERE T.tag = '{0}'".format(tag)
 
@@ -822,10 +821,13 @@ def searchtags():
         print('photopath: ', photopath[4:-5])
         # photopath = photopath[3:-3]
         #This is causing photo not to show
-        photopath = photopath[4:-4]
+        photopath = photopath[4:-5]
         photopaths.append(photopath)
+        if photopath == '':
+            return render_template('searchtags.html',
+                                   message="There are no photos tagged with: " + str(name)[2:-1])
     return render_template('searchtags.html', photopaths= photopaths,
-                           message="Here are all photos tagged with: " + str(name))
+                           message="Here are all photos tagged with: " + str(name)[2:-1])
 
 
 # def getTaggedPhotos2(tag_word):

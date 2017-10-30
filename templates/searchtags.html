@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
     <link rel="stylesheet" type="text/css" href="../static/style.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -58,12 +59,14 @@
       </form>
     </div>
         {% if message %}
-    <h4>{{message}}:</h4>
+    <h4>{{message}}</h4>
     {% endif %}
 
     {% if photopaths %}
         {% for photo in photopaths %}
-            <img src="../static/uploads/{{ photo }}" style=" width:25%; height:25%;"/>
+            <div style='height: 200px; width: 200px; '>
+            <img src="../static/uploads/{{ photo }}" style="height: 100%; width: 100%; object-fit: contain;"/>
+            </div>
         {% endfor %}
     {% endif %}
 
