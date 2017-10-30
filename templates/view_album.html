@@ -10,20 +10,25 @@
 
 </head>
 <body>
+  <h1>{{ album }}</h1>
 {% if message  %}
-  <h1>{{ message }}</h1>
+  <h3>{{ message }}</h3>
 {% endif %}
-    <h1>{{ album }}</h1>
-    <a href='/deletealbum/{{album}}'>Delete Album</a>
 
+
+{% if  album  != "Unsorted" %}
+    <a href='/deletealbum/{{album}}'>Delete Album</a>
+{% endif %}
 
 {% if photopath %}
     {% for photo in photopath %}
 
         <img src="../static/uploads/{{ photo[0] }}">
         <figure>
-        <figcaption>Caption: {{ photo[2] }}</figcaption>
+        <figcaption>Caption: {{ photo[2] }}</figcaption> <a href='/deletepicture/{{photo[1]}}'>Delete Picture</a>
         </figure>
+        <br>
+
 
     {% endfor %}
 {% endif %}
