@@ -75,15 +75,15 @@ div.datetime{
     <img src="../static/uploads/{{ picture}}" style="height: 30%; width: 30%;"><br>
 Posted by: {{owner[0]}}<br>
 
-    {{ tags }}
+    
 {% if tags %}Tagged:
 	{% for tag in tags %}
 		<a href='/{{tag[0]}}'>{{tag[0]}}</a></t>
 	{% endfor %}
 {% endif %}
+<br>
 
-
-{% if likes %}
+{% if likes %}Likes:
 {{likes}}<br>
 {% endif %}
 

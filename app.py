@@ -433,6 +433,14 @@ def getPhotoOwner(photo_id):
         #return cursor.fetchone()
         return username
 
+#input userID and return username:
+def getUsername(uid):
+    print('getUsername id: ', uid)
+    cursor = conn.cursor()
+    username = "SELECT username FROM Users WHERE user_id = '{0}'".format(uid)
+    cursor.execute(username)
+    username = cursor.fetchone()
+    return username
 
 def getPhotoOwnerID(photo_id):
 	cursor=conn.cursor()
@@ -654,26 +662,7 @@ def browse():
 
 
 
-        # return render_template('search.html')
-#Should return USERS that created comments that match search
-#return users ordered by number of comments
-#that match the query for each user in descending order
-# @app.route('/search',methods=['GET','POST'])
-# @flask_login.login_required
-# def search_comments():
-#     comments = request.form.get('comments')
-#     comments = comments.split(' ')
-#     cursor = conn.cursor()
-#     search = " "
-#     for word in comments:
-#         user = "SELECT userID" \
-#                "FROM Comments " \
-#                "WHERE text = '{0}'".format(word)
-#         search += user
-#         print(search)
-#     result = cursor.execute(search)
-#     result = cursor.fetchall()
-#     return render_template('search.html', users = result, message="Comment search results:")
+
 
 #friend profile not necessary anymore..will delete later
 #when you click each user, get their info to display their profile
@@ -908,6 +897,30 @@ def friend_recommendations():
 def searchcommentload():
     return render_template('searchcomments.html')
 
+
+#Should return USERS that created comments that match search
+#return users ordered by number of comments
+#that match the query for each user in descending order
+@app.route('/searchcomments',methods=['GET','POST'])
+@flask_login.login_required
+def search_comments():
+    comments = request.form.get('comments')
+    comments = comments.split(' ')
+    cursor = conn.cursor()
+    search = " "
+    for word in comments:
+        user = "SELECT userID " \
+               "FROM Comments " \
+               "WHERE text = '{0}'".format(word)
+        search += user
+        print(search)
+    result = cursor.execute(search)
+    result = cursor.fetchall()
+    return render_template('search.html', users = result, message="Comment search results:")
+
+
+
+
 @app.route('/searchtags')
 @flask_login.login_required
 def searchtagload():
@@ -971,14 +984,22 @@ def like_photo(photo):
     print('photopath: ', photopath)
     photopath = photopath[4:-5]
     print('photopath: ', photopath)
+    users = like_users(photo)       #returns user_id
+    listusernames =[]
+    for id in users:
+        print('id: ', str(id)[1:-1])
+        username = getUsername(str(id)[1:-1])
+        listusernames.append(username)
+    print('listusernames: ', listusernames)
+    print('like_photo: ', users )
     try:
         uid = getUserIdFromEmail(flask_login.current_user.id)
         cursor=conn.cursor()
         cursor.execute("INSERT INTO Likes (userID, photoID) VALUES ('{0}', '{1}')".format(uid,photo))
         conn.commit()
-        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=like_users(photo), owner=getPhotoOwner(photo), comments=getPhotoComments(photo), message="Liked!")
+        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=listusernames, owner=getPhotoOwner(photo), comments=getPhotoComments(photo), message="Liked!")
     except:
-        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=like_users(photo), owner = getPhotoOwner(photo), comments=getPhotoComments(photo),message="You've already liked this photo!")
+        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=listusernames, owner = getPhotoOwner(photo), comments=getPhotoComments(photo),message="You've already liked this photo!")
 
 # default page
 @app.route("/", methods=['GET'])
