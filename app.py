@@ -794,8 +794,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -986,16 +986,17 @@ def searchtags():
 
         cursor.execute(photopath)
         photopath = cursor.fetchall()
-        photopath = str(photopath)
-        print('photopath: ', photopath[4:-5])
-        # photopath = photopath[3:-3]
-        #This is causing photo not to show
-        photopath = photopath[4:-5]
-        photopaths.append(photopath)
+        # photopath = str(photopath)
+        # print('photopath: ', photopath[4:-5])
+        # # photopath = photopath[3:-3]
+        # #This is causing photo not to show
+        # photopath = photopath[4:-5]
+        #photopaths.append(photopath)
         if photopath == '':
             return render_template('searchtags.html',
                                    message="There are no photos tagged with: " + str(name)[2:-1])
-    return render_template('searchtags.html', photopaths= photopaths,
+    print('searchTags photopath: ', photopath)
+    return render_template('searchtags.html', photopaths= photopath,
                            message="Here are all photos tagged with: " + str(name)[2:-1])
 
 
@@ -1029,7 +1030,6 @@ def searchtags2(tag):
                                    message="There are no photos tagged with: " + str(tag))
     return render_template('searchtags.html', photopaths= photopath,
                            message="Here are all photos tagged with: " + str(tag))
-
 # def getTaggedPhotos2(tag_word):
 #     cursor = conn.cursor()
 #     cursor.execute("SELECT p.imgdata, p.photoid FROM Photos p, Has_Tag h, Tags t WHERE h.photoid=p.photoid \
