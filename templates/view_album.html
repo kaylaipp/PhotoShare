@@ -84,7 +84,8 @@ div.datetime{
         <figure>
         <figcaption>Caption: {{ photo[2] }}    </figcaption>
         </figure>
-        <img src="../static/uploads/{{ photo[0] }}"><br>
+        <div style='height: 700px; width: 700px; background-color: white'>
+        <img src="../static/uploads/{{ photo[0] }}" style="width: 100%; height: 100%; object-fit: contain"><br>
 
 {#        <form method="post" action="{{ url_for('add_comment',album=album,photo=photo[1] )}}">#}
 {#        <label for="comment">Add comment:#}
@@ -92,7 +93,6 @@ div.datetime{
 {#        </form>#}
 
 Comments
-
         <br><a href='/like/{{photo[1]}}'>Like!</a>
 
         {% if comments %}
