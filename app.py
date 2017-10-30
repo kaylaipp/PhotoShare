@@ -212,7 +212,7 @@ def listalbums(uid):
 # def albumpageview():
 # 	return render_template('view_album.html')
 
-@app.route("/view_album/<album>", methods=['GET', 'POST'])
+@app.route("/view_album/<album>")
 def view_album(album):
         try:
             uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -230,10 +230,29 @@ def view_album(album):
             print("couldn't find all comments")
             return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
         return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
-#if flask.request.method == 'POST':
-#    comment = request.form.get('comment')
-#    test = isCommentUnique(comment)
-    #if test:
+
+@app.route("/add_comment/<album>/<photo>", methods=['GET', 'POST'])
+def add_comment(album,photo):
+    if flask.request.method == 'POST':
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        datetime = time.strftime("%Y-%m-%d %T")
+        date = time.strftime("%Y-%m-%d")
+        comment = request.form.get('comment')
+        test = isCommentUnique(comment)
+        if test:
+            insertComment(comment,uid, date)
+            cursor=conn.cursor()
+            cursor.execute("SELECT MAX(commentID) FROM Comments")
+            cid = cursor.fetchall()
+            cid = cid[0][0]
+        else:
+            cid = getCommentIDFromText(comment)
+            cid = cid[0][0]
+        insertHasComment(cid,photo,uid)
+        return flask.redirect(flask.url_for('view_album', album=album))
+
+
+
 
 
 
@@ -374,7 +393,7 @@ def getTaggedPhotos(tag_word):
 
 
 def getCommentIDFromText(comment_text):
-    cursor = conn.cursor
+    cursor = conn.cursor()
     cursor.execute("SELECT S.commentID FROM Comments S WHERE S.text = '{0}'".format(comment_text))
     return cursor.fetchall()
 
@@ -389,9 +408,9 @@ def getPhotoPath(pid):
     cursor.execute("SELECT photopath FROM Photos WHERE photoid = '{0}'".format(pid))
     return cursor.fetchall()
 
-def insertHasComment(commentID, photoid):
+def insertHasComment(commentID, photoid,uid):
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Has_Comment(commentID, photoid) VALUES('{0}','{1}')".format(commentID, photoid))
+    cursor.execute("INSERT INTO Has_Comment(commentID, photoid,commenterID) VALUES('{0}','{1}','{2}')".format(commentID, photoid,uid))
     conn.commit()
 
 #delete albums

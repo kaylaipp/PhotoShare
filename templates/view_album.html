@@ -66,7 +66,7 @@
         </figure>
         <img src="../static/uploads/{{ photo[0] }}"><br>
 
-        <form method="post" action="{{ url_for('view_album',album=album,picture=photo[1] )}}">
+        <form method="post" action="{{ url_for('add_comment',album=album,photo=photo[1] )}}">
         <label for="comment">Add comment:
         <input type="text" name="comment"/></label><input type="submit" /><br/>
         </form>

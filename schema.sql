@@ -59,7 +59,7 @@ CREATE TABLE Belongs_To
 
 CREATE TABLE Comments
 (
-  commentID INT,
+  commentID INT AUTO_INCREMENT,
   text TEXT NOT NULL,
   userID INT,
   date DATE,
@@ -69,9 +69,10 @@ CREATE TABLE Comments
 
 CREATE TABLE Has_Comment
 (
-  commentID INT, photoid INT,
-  PRIMARY KEY(commentID, photoid),
+  commentID INT, photoid INT, commenterID INT, date DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY(commentID, photoid, commenterID,date),
   FOREIGN KEY(commentID) REFERENCES Comments(commentID) ON DELETE CASCADE,
+  FOREIGN KEY(commenterID) REFERENCES Users(user_id) ON DELETE CASCADE,
   FOREIGN KEY(photoid) REFERENCES Photos(photoid) ON DELETE CASCADE
 );
 
