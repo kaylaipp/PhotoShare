@@ -90,7 +90,11 @@ div.datetime{
 {#        <label for="comment">Add comment:#}
 {#        <input type="text" name="comment"/></label><input type="submit" /><br/>#}
 {#        </form>#}
+
 Comments
+
+        <br><a href='/like/{{photo[1]}}'>Like!</a>
+
         {% if comments %}
             <div class = scroll>
             {% for each in comments %}

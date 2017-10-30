@@ -33,8 +33,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -270,7 +270,7 @@ def add_comment(album,photo):
 
 def getnumlikes(photo):
 	cursor=conn.cursor()
-	cursor.execute("SELECT COUNT(user_id) FROM Likes WHERE photoid='{0}'".format(photo))
+	cursor.execute("SELECT COUNT(userID) FROM Likes WHERE photoid='{0}'".format(photo))
 	return cursor.fetchone()[0]
 
 
@@ -286,8 +286,11 @@ def getPhotosFromAlbum(uid,albumid):
     cursor = conn.cursor()
     cursor.execute("SELECT S.photopath, S.photoid, S.caption FROM Photos S \
                     WHERE S.user_id = '{0}' AND S.album_id = '{1}'".format(uid,albumid))
+    photoinfo = cursor.fetchall()
+    print('getPhotosFromAlbum: ', photoinfo)
+    #return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
+    return photoinfo
 
-    return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getCommentForPicture(photoid):
 
@@ -419,7 +422,7 @@ def getPhotoLikes(photo_id):
 #input photoid and return tags for that photo
 def getTags(photo):
 	cursor = conn.cursor()
-	cursor.execute("SELECT tag FROM Tags JOIN Has_Tags H on H.tagID = T.tagID WHERE H.photoid = '{0}'".format(photo))
+	cursor.execute("SELECT tag FROM Tags T JOIN Has_Tag H on H.tagID = T.tagID WHERE H.photoid = '{0}'".format(photo))
 	return cursor.fetchall()
 
 #input photoid and return users that have liked photo
@@ -430,10 +433,22 @@ def like_users(photo):
 
 #input photoid and get username for owner
 def getPhotoOwner(photo_id):
-	cursor=conn.cursor()
-	cursor.execute("SELECT username FROM Users U, Photos P WHERE photoid= '{0}' AND P.user_id=U.user_id".format(photo_id))
-	return cursor.fetchone()
+        print('getPhotoOwner photoid: ', photo_id)
+        cursor=conn.cursor()
+        cursor.execute("SELECT username FROM Users U, Photos P WHERE photoid= '{0}' AND P.user_id=U.user_id".format(photo_id))
+        username = cursor.fetchone()
+        print('getPhotoOwner: ', username)
+        #return cursor.fetchone()
+        return username
 
+#input userID and return username:
+def getUsername(uid):
+    print('getUsername id: ', uid)
+    cursor = conn.cursor()
+    username = "SELECT username FROM Users WHERE user_id = '{0}'".format(uid)
+    cursor.execute(username)
+    username = cursor.fetchone()
+    return username
 
 def getPhotoOwnerID(photo_id):
 	cursor=conn.cursor()
@@ -450,10 +465,13 @@ def getPhotoOwnerID(photo_id):
 #input photoid and get comment texts, username and date from each user
 def getPhotoComments(photo_id):
     cursor = conn.cursor()
-    cursor.execute("SELECT C.text, U.username FROM Users C, Comments C, Has_Comment H, Photo P " \
+    cursor.execute("SELECT C.text, U.username FROM Users U, Comments C, Has_Comment H, Photos P " \
                    "WHERE H.commenterID = U.user_id AND C.commentID = H.commentID " \
                    "AND P.photoid = '{0}'".format(photo_id))
-    return cursor.fetchall() # (comment_text, firstname, lastname))
+    comments = cursor.fetchall()
+    print('getPhotoComments: ', comments)
+    #return cursor.fetchall() # (comment_text, firstname, lastname))
+    return comments
 
 def contributionscoreINC(user_id):
     cursor = conn.cursor()
@@ -700,26 +718,7 @@ def browse():
 
 
 
-        # return render_template('search.html')
-#Should return USERS that created comments that match search
-#return users ordered by number of comments
-#that match the query for each user in descending order
-# @app.route('/search',methods=['GET','POST'])
-# @flask_login.login_required
-# def search_comments():
-#     comments = request.form.get('comments')
-#     comments = comments.split(' ')
-#     cursor = conn.cursor()
-#     search = " "
-#     for word in comments:
-#         user = "SELECT userID" \
-#                "FROM Comments " \
-#                "WHERE text = '{0}'".format(word)
-#         search += user
-#         print(search)
-#     result = cursor.execute(search)
-#     result = cursor.fetchall()
-#     return render_template('search.html', users = result, message="Comment search results:")
+
 
 #friend profile not necessary anymore..will delete later
 #when you click each user, get their info to display their profile
@@ -795,8 +794,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -950,6 +949,31 @@ def friend_recommendations():
 def searchcommentload():
     return render_template('searchcomments.html')
 
+
+#Should return USERS that created comments that match search
+#return users ordered by number of comments
+#that match the query for each user in descending order
+@app.route('/searchcomments',methods=['GET','POST'])
+@flask_login.login_required
+def search_comments():
+    comments = request.form.get('comments')
+    print('searchcomments: ', comments)
+    # comments = comments.split(' ')
+    # cursor = conn.cursor()
+    #search = " "
+    user = "SELECT U.username " \
+            "FROM Comments C JOIN Users U on U.user_id = C.userID " \
+            "WHERE text = '{0}'".format(comments)
+
+    #search += user
+    #print(search)
+    result = cursor.execute(user)
+    result = cursor.fetchall()
+    print('searchcomments user: ', result)
+    return render_template('searchcomments.html', users = result, comment = comments)
+
+
+
 @app.route('/searchtags')
 @flask_login.login_required
 def searchtagload():
@@ -1002,20 +1026,33 @@ def searchtags():
 #         photopath = getPhotoPath(tagged)
 #         print('photopath: ', photopath)
 #     return render_template('searchtags.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos2(tag_word))
-#
-# @app.route('/like/<photo>', methods=['GET','POST'])
-# @flask_login.login_required
-# def like_photo(photo):
-# 	try:
-# 		uid = getUserIdFromEmail(flask_login.current_user.id)
-# 		cursor=conn.cursor()
-# 		cursor.execute("INSERT INTO Likes (user_id, picture_id) VALUES ('{0}', '{1}')".format(uid,photo))
-#         photopath = getPhotoPath(photo)
-#         print('photopath: ', photopath)
-#         conn.commit()
-#         return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=like_users(photo), owner=getPhotoOwner(photo), comments=getComments(photo), message="Liked!")
-# 	except:
-#         return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=like_users(photo), comments=getComments(photo),message="You've already liked this photo!", owner=getPhotoOwner(photo))
+
+@app.route('/like/<photo>', methods=['GET','POST'])
+@flask_login.login_required
+def like_photo(photo):
+    #get photopath and remove excess characters
+    photopath = getPhotoPath(photo)
+    print('photopath: ', photopath)
+    photopath = str(photopath)
+    print('photopath: ', photopath)
+    photopath = photopath[4:-5]
+    print('photopath: ', photopath)
+    users = like_users(photo)       #returns user_id
+    listusernames =[]
+    for id in users:
+        print('id: ', str(id)[1:-1])
+        username = getUsername(str(id)[1:-1])
+        listusernames.append(username)
+    print('listusernames: ', listusernames)
+    print('like_photo: ', users )
+    try:
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        cursor=conn.cursor()
+        cursor.execute("INSERT INTO Likes (userID, photoID) VALUES ('{0}', '{1}')".format(uid,photo))
+        conn.commit()
+        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=listusernames, owner=getPhotoOwner(photo), comments=getPhotoComments(photo), message="Liked!")
+    except:
+        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=listusernames, owner = getPhotoOwner(photo), comments=getPhotoComments(photo),message="You've already liked this photo!")
 
 # default page
 @app.route("/", methods=['GET'])

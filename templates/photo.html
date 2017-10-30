@@ -1,0 +1,112 @@
+<!doctype html>
+<head>
+        <link rel="stylesheet" type="text/css" href="../static/style.css">
+    <link rel="stylesheet" href="https://raw.githubusercontent.com/kaylaipp/PhotoShare/master/templates/pastylesheet.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Photoshare</title>
+</head>
+
+<body>
+<style>
+
+#nav {
+
+}
+#nav ul{
+    position:fixed;
+    top:0;
+    width:100%;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background-color:#333;
+}
+#nav li{
+    float:left;
+}
+#nav li a{
+    display:block;
+    color:white;
+    text-align:center;
+    padding: 14px 16px;
+    text-decoration:none;
+}
+#nav li a:focus,li a:hover {
+
+    background-color: #111;
+}
+
+
+
+div.scroll {
+    background-color: rgb(224, 224, 224);
+    width: 400px;
+    height: 250px
+    ;
+    overflow: scroll;
+}
+
+div.commentname {
+    font-weight: bold;
+    color: #17039f;
+
+}
+
+div.datetime{
+    font-weight: lighter;
+    font-size: smaller;
+}
+
+#bottom {
+    position:fixed;
+    bottom:0;
+}
+</style>
+{% if message %}
+<h2>{{message}}</h2>
+{% endif %}
+
+{% if picture %}
+{#<a href= '/photo/{{picture[2]}}'><img src='data:image/png;base64, {{picture[0]}}'/></a><br>#}
+{#<i>{{picture[1]}}</i><br>#}
+    <img src="../static/uploads/{{ picture}}" style="height: 30%; width: 30%;"><br>
+Posted by: {{owner[0]}}<br>
+
+
+{% if tags %}Tagged:
+	{% for tag in tags %}
+		<a href='/{{tag[0]}}'>{{tag[0]}}</a></t>
+	{% endfor %}
+{% endif %}
+<br>
+
+{% if likes %}Likes:
+{{likes}}<br>
+{% endif %}
+
+{% if users %}
+	{% for user in users %}
+		<li>{{user[0]}}</li>
+	{% endfor %}
+{% endif %}
+{% endif %}
+
+<div id="nav">
+    <ul>
+        <li><a href='/profile'>Profile</a></li>
+        <li><a href='/new_album'>Create new album</a></li>
+        <li><a href='/upload'>Upload a photo</a></li>
+        <li><a href='/search'>Search Users</a></li>
+        <li><a href='/searchcomments'>Search Comments</a></li>
+        <li><a href='/searchtags'>Search Tags</a></li>
+        <li><a href='/browse' >Browse</a></li>
+
+        <li><a href='/logout'>Logout</a></li>
+    </ul>
+</div>
+
+</body>
+</html>
