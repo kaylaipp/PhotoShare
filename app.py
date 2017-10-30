@@ -31,8 +31,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -322,6 +322,11 @@ def getTaggedPhotos(tag_word):
     print(photos)
     return photos
 
+#get photopath of photo based on photoid
+def getPhotoPath(pid):
+    cursor = conn.cursor()
+    cursor.execute("SELECT photopath FROM Photos WHERE photoid = '{0}'".format(pid))
+    return cursor.fetchall()
 
 
 #delete albums
@@ -574,8 +579,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -729,19 +734,39 @@ def friend_recommendations():
     return final
 
 
-#To search tags
-# @app.route('/search_tags', methods=['GET', 'POST'])
-# def search_tags():
-#     tag_word = request.form.get('tag_word')
-#     return render_template('view_album.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos(tag_word))
+@app.route('/searchtags')
+@flask_login.login_required
+def searchtagload():
+    return render_template('searchtags.html')
 
-@app.route('/all/<tag>', methods=['GET'])
-def search_tags(tag):
-    if(len(tag)!= 0):
-        tagged = getTaggedPhotos(tag)
-        uid = getUserIdFromEmail(flask_login.current_user.id)
-        return render_template('search.html', photos=tagged,
-                               message="Here are all photos tagged with: " + tag)
+
+@app.route('/searchtags', methods = ['GET', 'POST'])
+@flask_login.login_required
+def searchtags():
+    #try:
+        #get list of tags
+        name = request.form.get('tags')
+        name = name.split(' ')
+        print('name: ', name)
+
+        #go through each tag in taglist and get photos for tag
+        #need to get photopaths for all photos
+        photopaths = []
+        for tag in name:
+            #returns photoid of all photos with certain tag
+            tagged = getTaggedPhotos(tag)
+
+            #tagged returns a tuple and i need it to return an int to put into getPhotoPath
+            print('tagged: ', tagged)
+            for id in tagged:
+                #go through each photoid, and get photopath for each photo
+                photopath = getPhotoPath(id)
+                print('photopath: ', photopath)
+                photopaths.append(photopath)
+            uid = getUserIdFromEmail(flask_login.current_user.id)
+        return render_template('searchtags.html', photos= photopaths,message="Here are all photos tagged with: " + str(name)[3:-2])
+    # except:
+    #     return render_template('searchtags.html', message="No photos found, please try again")
 
 # default page
 @app.route("/", methods=['GET'])
