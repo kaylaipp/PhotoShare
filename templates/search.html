@@ -44,6 +44,14 @@
         {% endfor %}
     {% endif %}
 
+    <h4>Users To Add</h4>
+{#    {% if friendrecs %}#}
+        {% for friend in friendrecs %}
+{#            <li><a href="/addfriend/{{friend[0]}}"> {{friend[1] + ' ' + friend[2]}} </a></li>#}
+            <li><a href="/addfriend/{{friend}}"> {{ friend }} </a></li>
+        {% endfor %}
+{#    {% endif %}#}
+
 {#    <h2>Users To Add </h2>#}
 {#    <div class = "friendrecs">#}
 {#    <ul>#}

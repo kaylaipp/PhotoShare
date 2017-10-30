@@ -20,14 +20,28 @@ body {
     vertical-align: middle;
 }
 
-ul{
-    position: relative;
-    left: 35%;
-    padding: 3%;
-}
-li{
-    text-align: center;
+ul {
     list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: #111;
 }
 
 div.col-lg-6{
@@ -50,4 +64,15 @@ div.albums{
     position: relative;
     right: 35%;
     text-align: center;
+}
+
+img {
+    display: block;
+    margin: 0 auto;
+    padding-bottom: 2%;
+}
+
+div.caption{
+    position: relative;
+    left: 38%
 }

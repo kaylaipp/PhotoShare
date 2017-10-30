@@ -22,6 +22,7 @@
 {% if numberfriends %}
 {#    <li><a href="/allfriends"> {{ numberfriends }} </a>friends</li>#}
     <li><a href="/friends"> {{ numberfriends }} </a>friends</li>
+
 {% endif %}
 
 {%  if albumname %}
@@ -43,7 +44,11 @@
 {% if photopath %}
     {% for photo in photopath %}
 
+<<<<<<< HEAD
         <img style='height: 100%; width: 100%; object-fit: contain;' src = '../static/uploads/{{ photo }}'>
+=======
+        <img src="../static/uploads/{{ photo }}" style=" width:25%; height:25%;"/>
+>>>>>>> c2ce40eb9cc0184dd37e8c40efa0f1a1fb0c06f8
 
     {% endfor %}
 {% endif %}
@@ -57,9 +62,6 @@
 {##}
 {#    {% endfor %}#}
 {#{% endif %}#}
-
-
-
 
 {#display top tags #}
 {% if tags %}
@@ -78,8 +80,7 @@
 {% endif %}
 {#<img src = "../uploads/img3.png">#}
 
-
-<div class = 'profilenav'>
+<div class = "nav">
     <ul>
     <li><a href='/new_album'>Create new album</a></li>
     <li><a href='/upload'>Upload a photo</a></li>

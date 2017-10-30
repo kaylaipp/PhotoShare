@@ -22,14 +22,17 @@ import time
 # from werkzeug import secure_filename
 import os, base64
 
+#for string formatting
+import re
+
 mysql = MySQL()
 app = Flask(__name__)
 app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -154,8 +157,13 @@ def register_user():
         # creates album Unsorted for all unsorted pictures
         createUnsorted(uid, date)
 
+<<<<<<< HEAD
         return render_template('profile.html', firstname=firstname, message='Account Created!')
         #return flask.redirect(flask.url_for('profile.html', firstname=firstname, message='Account Created!'))
+=======
+        return render_template('profile.html', name=firstname, message='Account Created!')
+        #return flask.redirect(flask.url_for('profile.html', name=firstname, message='Account Created!'))
+>>>>>>> c2ce40eb9cc0184dd37e8c40efa0f1a1fb0c06f8
     else:
         print("couldn't find all tokens")
         return render_template('register.html', supress=False)
@@ -212,6 +220,7 @@ def listalbums(uid):
 
 def view_album():
     if flask.request.method == 'POST':
+        #getUserNameUid(flask_login.current_user.id)
         album = request.form.get('album')
         album = str(album)
 
@@ -287,8 +296,14 @@ def isAlbumNameUnique(name,uid):
 
 def getUsersFriends(uid):
     cursor = conn.cursor()
-    cursor.execute("SELECT user_id2 FROM Friends_with WHERE user_id1 = '{0}'".format(uid))
-    return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
+    #cursor.execute("SELECT user_id2 FROM Friends_with WHERE user_id1 = '{0}'".format(uid))
+    #cursor.execute("SELECT userID1 FROM Friends WHERE userID1 = '{0}' OR userID2 = '{0}'".format(uid))
+    cursor.execute("SELECT userID1 FROM Friends WHERE userID2 = '{0}' "
+                   "UNION SELECT userID2 FROM Friends WHERE userID1 = '{0}'".format(uid))
+    #cursor.execute(query)
+    uidtuple = cursor.fetchall()
+    #return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
+    return uidtuple
 
 def getTopTags():
     cursor = conn.cursor()
@@ -397,6 +412,13 @@ def getUserId(first_name, last_name):
     cursor.execute(query)
     user_id = cursor.fetchone()[0]
     return user_id
+def getUserNameUid(uid):
+    cursor = conn.cursor()
+    query = "SELECT firstname, lastname FROM Users WHERE user_id = '{0}'".format(uid)
+    cursor.execute(query)
+    name = cursor.fetchone()
+    #name = name[-10:68]
+    return name
 
 # end login code
 
@@ -427,9 +449,10 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 @app.route('/search')
 @flask_login.login_required
 def searchpage():
-    #friendrecs = friend_recommendations()
-    #return render_template('search.html', friendrecs = friendrecs)
-    return render_template('search.html')
+    friendrecs = friend_recommendations()
+    #friendrecs = str(friendrecs)
+    return render_template('search.html', friendrecs = friendrecs)
+    #return render_template('search.html')
 
 #when search button is pressed
 @app.route('/search',methods=['GET','POST'])
@@ -554,8 +577,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -661,23 +684,53 @@ def showPhotos():
     print('showPhotos(): ', converted)
     return converted
 
+#return a string of recommended friends
+#based on your friend's friend's
+def friend_recommendations():
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    cursor = conn.cursor()
 
-#return friend recommendations
-# @flask_login.login_required
-# def friend_recommendations():
-#     uid = getUserIdFromEmail(flask_login.current_user.id)
-#     cursor = conn.cursor()
-#     #need to get users that are not friends
-#     query = "SELECT F2.userID2 "  \
-#             "FROM Friends F" \
-#             "JOIN Friends F2 ON F.userID2 = F2.userID1 " \
-#             "WHERE F2.userID2 NOT IN " \
-#                             "(SELECT F.userID2 FROM Friends " \
-#                              "WHERE userID1 = '{0}' AND F.userID1 = '{0}'".format(uid)
-#     cursor.execute(query)
-#     friendrecs = cursor.fetchall()
-#     print(friendrecs)
-#     return friendrecs
+    myfriends = getUsersFriends(uid)
+    myfriends = [i[0] for i in myfriends]
+
+    #go through each of current user's friends and get their friends
+    recommend = []
+    theirfriends = []
+    for friend in myfriends:
+        print('myfriend: ', friend)
+        theirfriends = getUsersFriends(friend)
+        print('their friend tuple list: ', theirfriends)     #a tuple
+        #convert tuple to list of uid ints
+        theirfriends = [i[0] for i in theirfriends]
+        print('thier friend int list: ', theirfriends)
+
+    #go through their friends and append to recommend list
+    #as long as 1) uid is not current user's uid, and 2) uid is not already in myfriends
+    for user in theirfriends:
+        if user not in myfriends and user != uid:
+            print('adding ', user, ' to recommended list')
+            recommend.append(user)
+    print('recommended list: ', recommend)
+
+    #go through recommened list, change those uids to actual string names
+    recommendfriends = []
+    for i in recommend:
+        name = getUserNameUid(i)
+        recommendfriends.append(name)
+
+    #Formatting D: need to change from unicode to strings for nicer output
+    first = []
+    last = []
+    for x in recommendfriends:
+        firstname = x[0].encode()
+        #print('firstname: ', firstname[-3:3])
+        lastname = x[1].encode()
+        first.append(firstname)
+        last.append(lastname)
+    final = zip(first,last)
+    print('final: ', final)
+    return final
+
 
 #To search tags
 # @app.route('/search_tags', methods=['GET', 'POST'])
@@ -692,7 +745,6 @@ def search_tags(tag):
         uid = getUserIdFromEmail(flask_login.current_user.id)
         return render_template('search.html', photos=tagged,
                                message="Here are all photos tagged with: " + tag)
-
 
 # default page
 @app.route("/", methods=['GET'])
