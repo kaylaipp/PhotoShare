@@ -905,19 +905,20 @@ def searchcommentload():
 @flask_login.login_required
 def search_comments():
     comments = request.form.get('comments')
-    comments = comments.split(' ')
-    cursor = conn.cursor()
-    search = " "
-    for word in comments:
-        user = "SELECT userID " \
-               "FROM Comments " \
-               "WHERE text = '{0}'".format(word)
-        search += user
-        print(search)
-    result = cursor.execute(search)
-    result = cursor.fetchall()
-    return render_template('search.html', users = result, message="Comment search results:")
+    print('searchcomments: ', comments)
+    # comments = comments.split(' ')
+    # cursor = conn.cursor()
+    #search = " "
+    user = "SELECT U.username " \
+            "FROM Comments C JOIN Users U on U.user_id = C.userID " \
+            "WHERE text = '{0}'".format(comments)
 
+    #search += user
+    #print(search)
+    result = cursor.execute(user)
+    result = cursor.fetchall()
+    print('searchcomments user: ', result)
+    return render_template('searchcomments.html', users = result, comment = comments)
 
 
 
