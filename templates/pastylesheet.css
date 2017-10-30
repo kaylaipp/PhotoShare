@@ -91,29 +91,7 @@ svg:not(:root){
 figure{
 	margin:1em 40px
 }
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
-}
 
-li {
-    float: left;
-}
-
-li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-li a:hover {
-    background-color: #111;
-}
 /*********************************************************************************************************:*/
 
 hr{
@@ -1312,6 +1290,7 @@ ol,ul{
 	margin-top:0;
 	margin-bottom:10px
 }
+
 ol ol,ol ul,ul ol,ul ul{
 	margin-bottom:0
 }
@@ -3406,25 +3385,64 @@ select[multiple].input-group-sm>.form-control,select[multiple].input-group-sm>.i
 .input-group-btn:last-child>.btn,.input-group-btn:last-child>.btn-group{
 	z-index:2;
 	margin-left:-1px
+/*}*/
+/*.nav{*/
+	/*list-style:none*/
+/*}*/
+
+/*.nav>ul{*/
+    /*position: fixed;*/
+    /*top: 0;*/
+    /*width: 100%;*/
+    /*list-style-type: none;*/
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*overflow: hidden;*/
+    /*background-color: #333;*/
+/*}*/
+/*.nav>li{*/
+	/*position:relative;*/
+	/*display:block*/
+/*}*/
+/*.nav>li>a{*/
+	/*position:relative;*/
+	/*display:block;*/
+	/*padding:10px 15px*/
+/*}*/
+/*.nav>li>a:focus,.nav>li>a:hover{*/
+	/*text-decoration:none;*/
+	/*background-color:#eee*/
+/*}*/
+
+
+#nav {
+
 }
-.nav{
-	padding-left:0;
-	margin-bottom:0;
-	list-style:none
+#nav ul{
+    position:fixed;
+    top:0;
+    width:100%;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background-color:#333;
 }
-.nav>li{
-	position:relative;
-	display:block
+#nav li{
+    float:left;
 }
-.nav>li>a{
-	position:relative;
-	display:block;
-	padding:10px 15px
+#nav li a{
+    display:block;
+    color:white;
+    text-align:center;
+    padding: 14px 16px;
+    text-decoration:none;
 }
-.nav>li>a:focus,.nav>li>a:hover{
-	text-decoration:none;
-	background-color:#eee
+#nav li a:focus,li a:hover {
+
+    background-color: #111;
 }
+
 .nav>li.disabled>a{
 	color:#777
 }

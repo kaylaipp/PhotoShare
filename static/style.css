@@ -20,41 +20,42 @@ body {
     vertical-align: middle;
 }
 
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #333;
-}
 
-li {
-    float: left;
-}
-
-li a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-li a:hover {
-    background-color: #111;
-}
 
 div.col-lg-6{
     position: relative;
     left: 25%
 }
 
-div.nav{
-    position: relative;
-    top: 0px;
-    right: 5px;
-}
 
+
+#nav {
+
+}
+#nav ul{
+    position:fixed;
+    top:0;
+    width:100%;
+    list-style-type:none;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background-color:#333;
+}
+#nav li{
+    float:left;
+}
+#nav li a{
+    display:block;
+    color:white;
+    text-align:center;
+    padding: 14px 16px;
+    text-decoration:none;
+}
+#nav li a:focus,li a:hover {
+
+    background-color: #111;
+}
 div.profilenav{
     position: relative;
     right: 35%;
@@ -75,4 +76,16 @@ img {
 div.caption{
     position: relative;
     left: 38%
+}
+
+ls a {
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+ls a:hover {
+    background-color: #ffff00;
 }

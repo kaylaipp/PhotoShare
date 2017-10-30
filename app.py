@@ -31,8 +31,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -157,13 +157,10 @@ def register_user():
         # creates album Unsorted for all unsorted pictures
         createUnsorted(uid, date)
 
-<<<<<<< HEAD
+
         return render_template('profile.html', firstname=firstname, message='Account Created!')
         #return flask.redirect(flask.url_for('profile.html', firstname=firstname, message='Account Created!'))
-=======
-        return render_template('profile.html', name=firstname, message='Account Created!')
-        #return flask.redirect(flask.url_for('profile.html', name=firstname, message='Account Created!'))
->>>>>>> c2ce40eb9cc0184dd37e8c40efa0f1a1fb0c06f8
+
     else:
         print("couldn't find all tokens")
         return render_template('register.html', supress=False)

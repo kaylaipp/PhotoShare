@@ -3,16 +3,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-        <link rel="stylesheet" href="https://raw.githubusercontent.com/kaylaipp/PhotoShare/master/templates/pastylesheet.css">
-        <!--<link rel="stylesheet" href="https://github.com/kaylaipp/PhotoShare/blob/master/templates/pastylesheet.css">
-        -->
+     <link rel="stylesheet" type="text/css" href="../static/style.css">
+        <!--<link rel="stylesheet" href="https://raw.githubusercontent.com/kaylaipp/PhotoShare/master/templates/pastylesheet.css">
+        --><link rel="stylesheet" href="https://github.com/kaylaipp/PhotoShare/blob/master/templates/pastylesheet.css">
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="../static/style.css">
+
+<title>Welcome To Your Profile</title>
 </head>
 <body>
 
-<title>Welcome To Your Profile</title>
+
 <h1>Welcome To Your Profile, {{ firstname }}!</h1>
 
 {% if message  %}
@@ -20,39 +22,40 @@
 {% endif %}
 
 {% if numberfriends %}
-{#    <li><a href="/allfriends"> {{ numberfriends }} </a>friends</li>#}
-    <li><a href="/friends"> {{ numberfriends }} </a>friends</li>
+{#    <ul><li><a href="/allfriends"> {{ numberfriends }} </a>friends</li></ul>#}
+    <ul><li><a href="/friends"> {{ numberfriends }} </a>friends</li></ul>
 
 {% endif %}
 
 {%  if albumname %}
 <h3>Your Albums</h3>
     <div class = "albums">
-    <ul>
+
         {% for album in albumname %}
             <form method="POST" action="{{ url_for('view_album') }}">
+            <ul>
             <li><input type="submit" name="album" value="{{ album }}"> </li>
+            </ul>
             </form>
 
         {% endfor %}
-    </ul>
+
     </div>
 {%  endif  %}
 
 
-<div style='height: 300px; width: 300px; background-color: black'>
+
 {% if photopath %}
+    <div style='height: 300px; width: 300px; background-color: black'>
     {% for photo in photopath %}
 
-<<<<<<< HEAD
         <img style='height: 100%; width: 100%; object-fit: contain;' src = '../static/uploads/{{ photo }}'>
-=======
-        <img src="../static/uploads/{{ photo }}" style=" width:25%; height:25%;"/>
->>>>>>> c2ce40eb9cc0184dd37e8c40efa0f1a1fb0c06f8
 
     {% endfor %}
+    </div>
 {% endif %}
-</div>
+
+
 {##}
 {#{% if photopath %}#}
 {#    {% for photo in photopath %}#}
@@ -69,25 +72,30 @@
      <label for="tag_word">Find photos by tag:</label>
      <input type="tag_word" name="tag_word" /><br />
 </form>
+
+
 <h3> Top 5 tags </h3>
      {% for t in tags %}
-         <li><a href='/all/{{t}}'>{{t}}</a> </li>
+
+         <ls><a href='/all/{{t}}'>{{t}}</a> </ls>
+
      {% endfor %}
 {% endif %}
 
 {% if message is none %}
   <p>You should <a href='/login'>login!</a></p>
 {% endif %}
-{#<img src = "../uploads/img3.png">#}
 
-<div class = "nav">
+
+
+<div id="nav">
     <ul>
-    <li><a href='/new_album'>Create new album</a></li>
-    <li><a href='/upload'>Upload a photo</a></li>
-    <li><a href='/search'>Search For Friends</a></li>
-    <li><a href='/logout'>Logout</a></li>
-    <li><a href='/'>Home</a></li>
+        <li><a href='/new_album'>Create new album</a></li>
+        <li><a href='/upload'>Upload a photo</a></li>
+        <li><a href='/search'>Search For Friends</a></li>
+        <li><a href='/logout'>Logout</a></li>
+        <li><a href='/'>Home</a></li>
     </ul>
 </div>
-
 </body>
+</html>
