@@ -66,9 +66,9 @@
         </figure>
         <img src="../static/uploads/{{ photo[0] }}"><br>
 
-        <form method="post" action="{{ url_for('view_album') }}">
-        <label for="comment">Add comment: </label>
-        <input type="text" name="comment"/><input type="submit" /><br/>
+        <form method="post" action="{{ url_for('view_album',album=album )}}">
+        <label for="comment">Add comment:
+        <input type="text" name="comment"/></label><input type="submit" /><br/>
         </form>
         <a href='/deletepicture/{{photo[1]}}'>Delete Picture</a>
 

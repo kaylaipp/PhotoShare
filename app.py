@@ -207,14 +207,30 @@ def listalbums(uid):
 
     return converted
 
-# Changed the album name diesplay on the profile to be buttons (we can format the buttons to look
-# like links later apparently if we want to
+
 
 # @app.route('/view_album')
 # def albumpageview():
 # 	return render_template('view_album.html')
 
-@app.route("/view_album", methods=['GET','POST'])
+@app.route("/view_album/<album>")
+def view_album(album):
+        try:
+            uid = getUserIdFromEmail(flask_login.current_user.id)
+            albumid = getAlbumID(uid,album)
+            photos = getPhotosFromAlbum(uid,albumid)
+
+        except:
+            print("couldn't find all tokens")
+            return render_template('view_album.html', album=album, albumid=albumid)
+        try:
+            comments = []
+            for each in photos:
+                    comments += [getCommentForPicture(each[1])]
+        except:
+            print("couldn't find all comments")
+            return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
+        return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
 
 def view_album():
     if flask.request.method == 'POST':
@@ -241,6 +257,7 @@ def view_album():
         return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
     #elif flask.request.method == "GET":
 
+@app.route("/view_album", methods=['GET', 'POST'])
 
 
 
@@ -378,7 +395,8 @@ def delete_album(album):
         albumid = getAlbumID(uid, album)
         cursor.execute("DELETE FROM Albums WHERE albumOwner='{0}' AND albumID='{1}'".format(uid,albumid))
         conn.commit()
-        return render_template('view_album.html', message='Album deleted!')
+
+        return render_template('view_album.html', album=album, message='Album deleted!')
 
 
 #delete pictures
