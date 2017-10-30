@@ -39,6 +39,26 @@
 }
 
 
+
+div.scroll {
+    background-color: rgb(224, 224, 224);
+    width: 400px;
+    height: 250px
+    ;
+    overflow: scroll;
+}
+
+div.commentname {
+    font-weight: bold;
+    color: #17039f;
+
+}
+
+div.datetime{
+    font-weight: lighter;
+    font-size: smaller;
+}
+
 #bottom {
     position:fixed;
     bottom:0;
@@ -72,19 +92,24 @@
         </form>
 
         {% if comments %}
+
+            <div class = scroll>
             {% for each in comments %}
                 {%  for eachcomment in each %}
-            <table style="width:100%">
 
-              <tr>
-                <th>{{ eachcomment[0] }}</th>
-                <th>{{ eachcomment[1] }}</th>
-                <th>{{ eachcomment[2] }} {{ eachcomment[3] }}</th>
-              </tr>
+                 <p>
+                    <div class = commentname>{{ eachcomment[2] }} {{ eachcomment[3] }}</div>
+                    {{ eachcomment[0] }}
+                    <br>
+                    <div class = datetime>{{ eachcomment[1] }}
+                        <a href='/deletecomment/{{ album }}/{{photo[1]}}&{{ eachcomment[0] }}&{{ eachcomment[1] }}&{{ eachcomment[4] }}/'>Delete comment</a></div>
 
-            </table>
+
+
+
                 {% endfor %}
             {% endfor %}
+            </div>
         {% endif %}
         <a href='/deletepicture/{{ album }}/{{photo[1]}}'>Delete Picture</a>
 

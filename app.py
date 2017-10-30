@@ -180,7 +180,7 @@ def listalbums(uid):
     #unsorted_count = "SELECT COUNT(photoid) FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
     unsorted_count = "SELECT photoid FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
     unsorted_count = cursor.execute(unsorted_count)
-    print("unsorted photo count", unsorted_count) ############################ why 1?
+
     # This hides the album "unsorted" if there are no photos in it
     if (unsorted_count < 1):
         albumnames = "SELECT name " \
@@ -202,7 +202,7 @@ def listalbums(uid):
     for name in albumnames:
         name = str(name)
         converted.append(name[3:-3])
-    print(albumnames)
+    #print(albumnames)
 
     return converted
 
@@ -225,8 +225,8 @@ def view_album(album):
         try:
             comments = []
             for each in photos:
-                print("comments",getCommentForPicture(each[1]))
-                comments += [getCommentForPicture(each[1])]
+
+                comments = [getCommentForPicture(each[1])] + comments
         except:
             print("couldn't find all comments")
             return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
@@ -251,6 +251,7 @@ def add_comment(album,photo):
             cid = cid[0][0]
         insertHasComment(cid,photo,uid)
         return flask.redirect(flask.url_for('view_album', album=album))
+
 
 
 
@@ -307,10 +308,11 @@ def getPhotosFromAlbum(uid,albumid):
 
 def getCommentForPicture(photoid):
     cursor = conn.cursor()
-    cursor.execute("SELECT S.text,R.date,Q.firstname,Q.lastname \
+    cursor.execute("SELECT S.text,R.date,Q.firstname,Q.lastname,R.commenterID \
                     FROM (Comments S LEFT JOIN Has_Comment R ON S.commentID = R.commentID \
                     LEFT JOIN Users Q ON Q.user_id = R.commenterID) \
-                    WHERE Q.user_id = S.userID AND R.photoid = '{0}'".format(photoid))
+                    WHERE Q.user_id = S.userID AND R.photoid = '{0}'\
+                    ORDER BY R.date DESC".format(photoid))
     return cursor.fetchall()
 
 def getUsersAlbums(uid):
@@ -450,6 +452,27 @@ def deletePhoto(photoID,album):
 
     return flask.redirect(flask.url_for('view_album',album=album))
 
+#delete comments
+@app.route("/deletecomment/<album>/<attrs>/", methods=['GET'])
+@flask_login.login_required
+def deleteComment(album,attrs):
+    print(attrs)
+    attrs = attrs.split('&')
+    photoid = int(attrs[0])
+    ctext = attrs[1]
+    cdate = attrs[2]
+    commenterid = int(attrs[3])
+    cid = int(getCommentIDFromText(ctext)[0][0])
+
+    cursor = conn.cursor()
+    query = "DELETE FROM Has_Comment WHERE (photoid = %s AND commenterID = %s AND date = %s AND commentID = %s)"
+    args = photoid,commenterid,cdate,cid
+    cursor.execute(query,args)
+    conn.commit()
+
+    return flask.redirect(flask.url_for('view_album', album=album))
+
+
 #display your friends on your profile page
 @app.route('/friends', methods=['GET'])
 def displayFriends():
@@ -459,13 +482,13 @@ def displayFriends():
             uid)
     cursor.execute(query)
     friends = cursor.fetchall()
-    print('friend count: ', len(friends))
+    #print('friend count: ', len(friends))
     #print('friends: ', friends)
     return render_template('friends.html', friends = friends, message = "Your Friends")
 
 def friendcount(uid):
     cursor = conn.cursor()
-    print(uid)
+    #print(uid)
     #count = "SELECT count(distinct(userID1 + userID2))" \
     #       "FROM Friends " \
     #       "WHERE userID1 OR userID2 = '{0}'".format(uid)
@@ -476,9 +499,9 @@ def friendcount(uid):
     #         "WHERE userID1 = '{0}'".format(uid)
     cursor.execute(query)
     friends = cursor.fetchall()
-    print('friend count: ', len(friends))
+
     count = len(friends)
-    print('count: ', str(count))
+
     #return str(count)[2:-4] #this was giving me count:  ((1,),) so i converted to string and sliced it
     return count
 
@@ -551,7 +574,7 @@ def search_friends():
                 "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
         cursor.execute(query)
         users = cursor.fetchall()
-        print(users)
+        # print(users)
         #info = getProfileInfo(uid)
         return render_template('search.html', users=users, message="User search results")
     except IndexError:
@@ -761,7 +784,7 @@ def showPhotos():
         #print("[line 462 in showPhotos()] photopath is ",path[3:-3]) ####################################
         converted.append(path[3:-3])                                  #### tried changing slice to include ext
     #take brackets off of final list
-    print('showPhotos(): ', converted)
+
     return converted
 
 #return a string of recommended friends
