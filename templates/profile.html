@@ -15,28 +15,26 @@
 
 }
 #nav ul{
-    position:fixed;
-    top:0;
-    width:100%;
-    list-style-type:none;
-    margin:0;
-    padding:0;
-    overflow:hidden;
-    background-color:#333;
-}
-#nav li{
-    float:left;
-}
-#nav li a{
-    display:block;
-    color:white;
-    text-align:center;
-    padding: 14px 16px;
-    text-decoration:none;
-}
-#nav li a:focus,li a:hover {
+{#    position:fixed;#}
+{#    top:0;#}
+{#    width:100%;#}
+{#    list-style-type:none;#}
+{#    margin:0;#}
+{#    padding:0;#}
+{#    overflow:hidden;#}
+{#    background-color:#333;#}
+{#    width: 940px;#}
+{#    position: relative;#}
+{#    bottom: 760px;#}
+{#    top: -300%;#}
+        width: 70%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    left: 178px;
 
-    background-color: #111;
 }
 
 ul {
@@ -106,99 +104,93 @@ td {
 </head>
 <body>
 
+<div id="profile_info">
+    <h1>Welcome To Your Profile, {{ firstname }}!</h1>
 
-<h1>Welcome To Your Profile, {{ firstname }}!</h1>
+    {% if message  %}
+      <p>{{ message }}</p>
+    {% endif %}
 
-{% if message  %}
-  <p>{{ message }}</p>
-{% endif %}
+    {% if numberfriends %}
+    {#    <ul><li><a href="/allfriends"> {{ numberfriends }} </a>friends</li></ul>#}
 
-{% if numberfriends %}
-{#    <ul><li><a href="/allfriends"> {{ numberfriends }} </a>friends</li></ul>#}
+        <h4><a href="/friends"> {{ numberfriends }} </a>friends </h4>
 
-    <h4><a href="/friends"> {{ numberfriends }} </a>friends </h4>
+    {% endif %}
 
-{% endif %}
-
-{%  if albumname %}
-<h3>Your Albums</h3>
     <div class = "albums">
-
-        {% for album in albumname %}
-
-            <ul>
-                <li><a href='/view_album/{{album}}'>"{{ album }}"</a></li>
-            {# <li><input type="submit" name="album" value="{{ album }}"> </li> #}
-            </ul>
-
-
-        {% endfor %}
-
-    </div>
-{%  endif  %}
-
-
-{#display top tags #}
-{% if tags %}
-{#    <form method="post" action="all/{{ t }}">#}
-{#     <label for="tag_word">Find photos by tag:</label>#}
-{#     <input type="tag_word" name="tag_word" /><br />#}
-{#</form>#}
-
-<h3> Top 5 tags </h3>
-     {% for t in tags %}
-{#         <ul><li><a href='/all/{{t}}'>{{t}}</a> </li></ul>#}
-         <ul><li><a href='/searchtags/{{t}}'>{{t}}</a> </li></ul>
-     {% endfor %}
-{% endif %}
-
-{% if mostCont %}
-<h3> Top 10 Users </h3>
-     {% for f in mostCont %}
-
-         <ul><li>{{ f }}</li></ul>
-
-     {% endfor %}
-{% endif %}
-
-{% if photopath %}
-    <div class = "responsive">
-        <div class = "gallery">
-        <div style='height: 300px; width: 300px; background-color: white'>
-        {% for photo in photopath %}
-
-        <img style='height: 100%; width: 100%; object-fit: contain;' src = '../static/uploads/{{ photo }}'>
-
-        {% endfor %}
-        </div>
-        </div>
+        {%  if albumname %}
+        <h3>Your Albums</h3>
+                {% for album in albumname %}
+                    <ul>
+                        <li><a href='/view_album/{{album}}'>"{{ album }}"</a></li>
+                    {# <li><input type="submit" name="album" value="{{ album }}"> </li> #}
+                    </ul>
+                {% endfor %}
+        {%  endif  %}
     </div>
 
-{% endif %}
+    {#display top tags #}
+    {% if tags %}
+    {#    <form method="post" action="all/{{ t }}">#}
+    {#     <label for="tag_word">Find photos by tag:</label>#}
+    {#     <input type="tag_word" name="tag_word" /><br />#}
+    {#</form>#}
+
+    <h3> Top 5 tags </h3>
+         {% for t in tags %}
+    {#         <ul><li><a href='/all/{{t}}'>{{t}}</a> </li></ul>#}
+             <ul><li><a href='/searchtags/{{t}}'>{{t}}</a> </li></ul>
+         {% endfor %}
+    {% endif %}
+
+    {% if mostCont %}
+    <h3> Top 10 Users </h3>
+         {% for f in mostCont %}
+
+             <ul><li>{{ f }}</li></ul>
+
+         {% endfor %}
+    {% endif %}
+
+    <div class = "gallery">
+        {% if photopath %}
+            <div class = "responsive">
+
+                <div style='height: 300px; width: 300px; background-color: white'>
+                {% for photo in photopath %}
+
+                <img style='height: 100%; width: 100%; object-fit: contain;' src = '../static/uploads/{{ photo }}'>
+
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
 
-{##}
-{#{% if photopath %}#}
-{#    {% for photo in photopath %}#}
-      {#  <iframe src="{{ photo }}" height="200" width="300"></iframe>#}
-{##}
-{#        <iframe src="../static/uploads/Screenshot_20161208-201759.jpg" height="200" width="300" ></iframe>#}
-{##}
-{#    {% endfor %}#}
-{#{% endif %}#}
+    {##}
+    {#{% if photopath %}#}
+    {#    {% for photo in photopath %}#}
+          {#  <iframe src="{{ photo }}" height="200" width="300"></iframe>#}
+    {##}
+    {#        <iframe src="../static/uploads/Screenshot_20161208-201759.jpg" height="200" width="300" ></iframe>#}
+    {##}
+    {#    {% endfor %}#}
+    {#{% endif %}#}
 
 
 
 
-{% if message is none %}
-  <p>You should <a href='/login'>login!</a></p>
-{% endif %}
+    {% if message is none %}
+      <p>You should <a href='/login'>login!</a></p>
+    {% endif %}
 
-
+</div>
 
 <div id="nav">
     <ul>
-        <li><a href='/'>Home</a></li>
+        <li><a href='/profile'>Home</a></li>
         <li><a href='/new_album'>Create new album</a></li>
         <li><a href='/upload'>Upload a photo</a></li>
         <li><a href='/search'>Search Users</a></li>

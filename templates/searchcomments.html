@@ -10,14 +10,14 @@
 
 }
 #nav ul{
-    position:fixed;
-    top:0;
-    width:100%;
-    list-style-type:none;
-    margin:0;
-    padding:0;
-    overflow:hidden;
-    background-color:#333;
+{#    position:fixed;#}
+    width: 70%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    left: 178px;
 }
 #nav li{
     float:left;
@@ -42,7 +42,7 @@
 
 <body>
     <h3>Search Comments</h3>
-    <h4>search comments by user</h4>
+    <h4>Enter a comment to search users</h4>
     <div class = "searchbar">
       <form action="/searchcomments" method = "post">
         <div class="input-group">
@@ -65,9 +65,19 @@
         {% endfor %}
     {% endif %}
 
-    <div id = 'nav'>
-      <ul> <li><a href='/profile'>Home</a></li></ul>
-    </div>
+<div id="nav">
+    <ul>
+        <li><a href='profile/'>Profile</a></li>
+        <li><a href='/new_album'>Create new album</a></li>
+        <li><a href='/upload'>Upload a photo</a></li>
+        <li><a href='/search'>Search Users</a></li>
+        <li><a href='/searchcomments'>Search Comments</a></li>
+        <li><a href='/searchtags'>Search Tags</a></li>
+        <li><a href='/browse' >Browse</a></li>
+
+        <li><a href='/logout'>Logout</a></li>
+    </ul>
+</div>
 </body>
 
 </html>

@@ -1,3 +1,8 @@
+/*h1#profile{*/
+    /*position: relative;*/
+    /*top: 8%;*/
+/*}*/
+
 h1,h2,h3,h4,h5{
     text-align: center;
 }
@@ -98,4 +103,19 @@ div.caption{
 }
 div.comment{
 
+}
+
+div.albums{
+    position: relative;
+    left: 0%;
+}
+
+div#profile_info{
+    position: relative;
+    top:8%;
+}
+
+div.gallery{
+    position: relative;
+    left: 20%
 }
