@@ -10,36 +10,7 @@
 
 <title>Welcome To Your Profile</title>
     <!-- I CANNOT figure out how to get this to work with an external css sheet so it's here now -->
-    <style>
 
-#nav {
-
-}
-#nav ul{
-    position:fixed;
-    top:0;
-    width:100%;
-    list-style-type:none;
-    margin:0;
-    padding:0;
-    overflow:hidden;
-    background-color:#333;
-}
-#nav li{
-    float:left;
-}
-#nav li a{
-    display:block;
-    color:white;
-    text-align:center;
-    padding: 14px 16px;
-    text-decoration:none;
-}
-#nav li a:focus,li a:hover {
-
-    background-color: #111;
-}
-    </style>
 </head>
 <body>
 
@@ -98,10 +69,10 @@
 
 {#display top tags #}
 {% if tags %}
-    <form method="post" action="all/{{ t }}">
-     <label for="tag_word">Find photos by tag:</label>
-     <input type="tag_word" name="tag_word" /><br />
-</form>
+{#    <form method="post" action="all/{{ t }}">#}
+{#     <label for="tag_word">Find photos by tag:</label>#}
+{#     <input type="tag_word" name="tag_word" /><br />#}
+{#</form>#}
 
 
 <h3> Top 5 tags </h3>
@@ -123,7 +94,9 @@
         <li><a href='/'>Home</a></li>
         <li><a href='/new_album'>Create new album</a></li>
         <li><a href='/upload'>Upload a photo</a></li>
-        <li><a href='/search'>Search For Friends</a></li>
+        <li><a href='/search'>Search Users</a></li>
+        <li><a href='/searchcomments'>Search Comments</a></li>
+        <li><a href='/searchtags'>Search Tags</a></li>
         <li><a href='/logout'>Logout</a></li>
     </ul>
 </div>
