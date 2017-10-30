@@ -70,6 +70,22 @@
         <label for="comment">Add comment:
         <input type="text" name="comment"/></label><input type="submit" /><br/>
         </form>
+
+        {% if comments %}
+            {% for each in comments %}
+                {%  for eachcomment in each %}
+            <table style="width:100%">
+
+              <tr>
+                <th>{{ eachcomment[0] }}</th>
+                <th>{{ eachcomment[1] }}</th>
+                <th>{{ eachcomment[2] }} {{ eachcomment[3] }}</th>
+              </tr>
+
+            </table>
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
         <a href='/deletepicture/{{ album }}/{{photo[1]}}'>Delete Picture</a>
 
 

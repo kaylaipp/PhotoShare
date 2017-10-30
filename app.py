@@ -225,7 +225,8 @@ def view_album(album):
         try:
             comments = []
             for each in photos:
-                    comments += [getCommentForPicture(each[1])]
+                print("comments",getCommentForPicture(each[1]))
+                comments += [getCommentForPicture(each[1])]
         except:
             print("couldn't find all comments")
             return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
@@ -306,8 +307,10 @@ def getPhotosFromAlbum(uid,albumid):
 
 def getCommentForPicture(photoid):
     cursor = conn.cursor()
-    cursor.execute("SELECT S.text,S.date,Q.firstname,Q.lastname FROM Comments S LEFT JOIN Has_Comment R ON S.commentID = R.commentID LEFT JOIN Users Q ON Q.user_id = S.userID\
-                    WHERE Q.user_id = S.userID AND R.photoid = '{0}'.format(photoid)")
+    cursor.execute("SELECT S.text,R.date,Q.firstname,Q.lastname \
+                    FROM (Comments S LEFT JOIN Has_Comment R ON S.commentID = R.commentID \
+                    LEFT JOIN Users Q ON Q.user_id = R.commenterID) \
+                    WHERE Q.user_id = S.userID AND R.photoid = '{0}'".format(photoid))
     return cursor.fetchall()
 
 def getUsersAlbums(uid):
