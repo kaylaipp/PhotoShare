@@ -17,16 +17,18 @@
 
 
 {% if  album  != "Unsorted" %}
-    <a href='/deletealbum/{{album}}'>Delete Album</a>
+    <a href='/deletealbum/{{album}}' style="position:relative; left: 46%;">Delete Album</a>
 {% endif %}
 
 {% if photopath %}
     {% for photo in photopath %}
 
-        <img src="../static/uploads/{{ photo[0] }}">
+        <img src="../static/uploads/{{ photo[0] }}" style="height: 25%; width: 25%;">
+        <div class = "caption">
         <figure>
         <figcaption>Caption: {{ photo[2] }}</figcaption> <a href='/deletepicture/{{photo[1]}}'>Delete Picture</a>
         </figure>
+        </div>
         <br>
 
 

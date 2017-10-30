@@ -212,6 +212,7 @@ def listalbums(uid):
 
 def view_album():
     if flask.request.method == 'POST':
+        #getUserNameUid(flask_login.current_user.id)
         album = request.form.get('album')
         album = str(album)
 
