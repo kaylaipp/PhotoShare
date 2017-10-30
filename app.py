@@ -33,8 +33,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -822,8 +822,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -888,15 +888,6 @@ def upload_file():
                     "INSERT INTO Has_Tag(tagID, photoid) VALUES ('{0}', '{1}')".format(tagID[0], photoid))
                 conn.commit()
 
-
-
-        #figuring out path for photo
-        # path = "/Users/kaylaippongi/Desktop/Photoshare/uploads/{}".format(str(album_id)) \
-        #        + "." + ext
-        # filename = str(filename)
-        # img = open(filename, 'wb')
-        # img.write(base64.decodestring(photo_data))
-        # print('upload_photo: ', photo_data)
 
         conn.commit()
         return render_template('new_album.html', name=flask_login.current_user.id, message='Photo uploaded!',photos=getUsersPhotos(uid))
@@ -1023,19 +1014,50 @@ def searchtags():
 
         cursor.execute(photopath)
         photopath = cursor.fetchall()
-        photopath = str(photopath)
-        print('photopath: ', photopath[4:-5])
-        # photopath = photopath[3:-3]
-        #This is causing photo not to show
-        photopath = photopath[4:-5]
-        photopaths.append(photopath)
+        # photopath = str(photopath)
+        # print('photopath: ', photopath[4:-5])
+        # # photopath = photopath[3:-3]
+        # #This is causing photo not to show
+        # photopath = photopath[4:-5]
+        #photopaths.append(photopath)
         if photopath == '':
             return render_template('searchtags.html',
                                    message="There are no photos tagged with: " + str(name)[2:-1])
-    return render_template('searchtags.html', photopaths= photopaths,
+    print('searchTags photopath: ', photopath)
+    return render_template('searchtags.html', photopaths= photopath,
                            message="Here are all photos tagged with: " + str(name)[2:-1])
 
 
+#when one of the top 5 tags is clicked
+#return list of photopaths for all photos
+@app.route('/searchtags/<tag>', methods = ['GET', 'POST'])
+@flask_login.login_required
+def searchtags2(tag):
+    photopaths = []
+    #returns tuple of all photopaths
+    photopath = "SELECT photopath FROM Photos P " \
+                "JOIN Has_Tag H on H.photoId = P.photoID JOIN Tags T on T.tagID = H.tagID " \
+                "WHERE T.tag = '{0}'".format(tag)
+    cursor.execute(photopath)
+    photopath = cursor.fetchall()
+
+    # photopath = str(photopath)
+    # length = len(photopath)
+    # print('lenghth: ', length)
+    #
+    # for path in range(length):
+
+    print('photopath: ', photopath)
+    print('photopath: ', photopath[4:-5])
+        # photopath = photopath[3:-3]
+        #This is causing photo not to show
+    #photopath = photopath[4:-5]
+    #photopaths.append(photopath)
+    if photopath == '':
+        return render_template('searchtags.html',
+                                   message="There are no photos tagged with: " + str(tag))
+    return render_template('searchtags.html', photopaths= photopath,
+                           message="Here are all photos tagged with: " + str(tag))
 # def getTaggedPhotos2(tag_word):
 #     cursor = conn.cursor()
 #     cursor.execute("SELECT p.imgdata, p.photoid FROM Photos p, Has_Tag h, Tags t WHERE h.photoid=p.photoid \

@@ -62,10 +62,13 @@
     <h4>{{message}}</h4>
     {% endif %}
 
+{#    this is photopaths for search tags -> list with mutliple photopaths #}
     {% if photopaths %}
+{#        {{ photopaths}}#}
         {% for photo in photopaths %}
+{#            {{ photo}}#}
             <div style='height: 200px; width: 200px; '>
-            <img src="../static/uploads/{{ photo }}" style="height: 100%; width: 100%; object-fit: contain;"/>
+            <img src="../static/uploads/{{(photo)[-1] }}" style="height: 100%; width: 100%; object-fit: contain;"/>
             </div>
         {% endfor %}
     {% endif %}
