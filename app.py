@@ -31,8 +31,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -256,39 +256,6 @@ def add_comment(album,photo):
 
 
 
-
-
-#
-# def view_album():
-#     if flask.request.method == 'POST':
-#         #getUserNameUid(flask_login.current_user.id)
-#         album = request.form.get('album')
-#         album = str(album)
-#
-#         try:
-#             uid = getUserIdFromEmail(flask_login.current_user.id)
-#             albumid = getAlbumID(uid,album)
-#             photos = getPhotosFromAlbum(uid,albumid)
-#
-#         except:
-#             print("couldn't find all tokens")
-#             #return render_template('view_album.html', album=albumname, albumid = album[1])
-#             return render_template('view_album.html', album=album, albumid=albumid)
-#         try:
-#             comments = []
-#             for each in photos:
-#                     comments += [getCommentForPicture(each[1])]
-#         except:
-#             print("couldn't find all comments")
-#             return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
-#         return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
-#     #elif flask.request.method == "GET":
-
-#@app.route("/view_album/<album>/<picture>", methods=['GET', 'POST'])
-#if flask.request.method == 'POST':
-
-
-#returns total number of likes for photoid
 def getnumlikes(photo):
 	cursor=conn.cursor()
 	cursor.execute("SELECT COUNT(user_id) FROM Likes WHERE photoid='{0}'".format(photo))
@@ -311,8 +278,9 @@ def getPhotosFromAlbum(uid,albumid):
     return cursor.fetchall()  # NOTE list of tuples, [(imgdata, pid), ...]
 
 def getCommentForPicture(photoid):
+
     cursor = conn.cursor()
-    cursor.execute("SELECT S.text,R.date,Q.firstname,Q.lastname,R.commenterID \
+    cursor.execute("SELECT S.text,R.date,Q.firstname,Q.lastname,R.commenterID,R.photoid \
                     FROM (Comments S LEFT JOIN Has_Comment R ON S.commentID = R.commentID \
                     LEFT JOIN Users Q ON Q.user_id = R.commenterID) \
                     WHERE Q.user_id = S.userID AND R.photoid = '{0}'\
@@ -725,8 +693,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':

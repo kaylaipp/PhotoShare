@@ -96,14 +96,14 @@ div.datetime{
             <div class = scroll>
             {% for each in comments %}
                 {%  for eachcomment in each %}
-
+                    {% if photo[1] == eachcomment[5] %}
                  <p>
                     <div class = commentname>{{ eachcomment[2] }} {{ eachcomment[3] }}</div>
                     {{ eachcomment[0] }}
                     <br>
                     <div class = datetime>{{ eachcomment[1] }}
                         <a href='/deletecomment/{{ album }}/{{photo[1]}}&{{ eachcomment[0] }}&{{ eachcomment[1] }}&{{ eachcomment[4] }}/'>Delete comment</a></div>
-
+                    {% endif %}
 
 
 
