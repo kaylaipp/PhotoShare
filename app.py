@@ -733,6 +733,12 @@ def friend_recommendations():
     print('final: ', final)
     return final
 
+@app.route('/searchcomments')
+@flask_login.login_required
+def searchcommentload():
+    return render_template('searchcomments.html')
+
+
 
 @app.route('/searchtags')
 @flask_login.login_required
