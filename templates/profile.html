@@ -39,9 +39,65 @@
     background-color: #111;
 }
 
-ul{
-    list-style-type:none;
-    text-align:center;
+ul {
+    list-style-type: none;
+    text-align: center;
+}
+div.gallery {
+    margin: 5px;
+    border: 1px solid #ccc;
+    float: left;
+    width: 180px;
+}
+
+div.gallery:hover {
+    border: 1px solid #777;
+}
+
+div.gallery img {
+    width: 100%;
+    height: auto;
+    display:inline;
+
+}
+
+div.desc {
+    padding: 15px;
+    text-align: center;
+
+}
+.responsive {
+    padding: 0 6px;
+    float: left;
+    width: 24.99999%;
+}
+
+@media only screen and (max-width: 700px){
+    .responsive {
+        width: 49.99999%;
+        margin: 6px 0;
+    }
+}
+
+@media only screen and (max-width: 500px){
+    .responsive {
+        width: 100%;
+    }
+}
+        table, td, th {
+
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    text-align: center;
+}
+td {
+	text-align: center;
 }
 
     </style>
@@ -82,29 +138,6 @@ ul{
 {%  endif  %}
 
 
-
-{% if photopath %}
-    <div style='height: 300px; width: 300px; background-color: black'>
-    {% for photo in photopath %}
-
-   <img style='height: 100%; width: 100%; object-fit: contain;' src = '../static/uploads/{{ photo }}'>
-
-
-    {% endfor %}
-    </div>
-{% endif %}
-
-
-{##}
-{#{% if photopath %}#}
-{#    {% for photo in photopath %}#}
-      {#  <iframe src="{{ photo }}" height="200" width="300"></iframe>#}
-{##}
-{#        <iframe src="../static/uploads/Screenshot_20161208-201759.jpg" height="200" width="300" ></iframe>#}
-{##}
-{#    {% endfor %}#}
-{#{% endif %}#}
-
 {#display top tags #}
 {% if tags %}
 {#    <form method="post" action="all/{{ t }}">#}
@@ -129,6 +162,34 @@ ul{
 
      {% endfor %}
 {% endif %}
+
+{% if photopath %}
+    <div class = "responsive">
+        <div class = "gallery">
+        <div style='height: 300px; width: 300px; background-color: white'>
+        {% for photo in photopath %}
+
+        <img style='height: 100%; width: 100%; object-fit: contain;' src = '../static/uploads/{{ photo }}'>
+
+        {% endfor %}
+        </div>
+        </div>
+    </div>
+
+{% endif %}
+
+
+{##}
+{#{% if photopath %}#}
+{#    {% for photo in photopath %}#}
+      {#  <iframe src="{{ photo }}" height="200" width="300"></iframe>#}
+{##}
+{#        <iframe src="../static/uploads/Screenshot_20161208-201759.jpg" height="200" width="300" ></iframe>#}
+{##}
+{#    {% endfor %}#}
+{#{% endif %}#}
+
+
 
 
 {% if message is none %}
