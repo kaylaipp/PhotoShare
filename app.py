@@ -76,7 +76,7 @@ def request_loader(request):
     cursor.execute("SELECT password FROM Users WHERE email = '{0}'".format(email))
     data = cursor.fetchall()
     pwd = str(data[0][0])
-    user.is_authenticated = request.form['password'] == pwd
+    #user.is_authenticated = (request.form['password'] == pwd) ################### this line is giving me issues
     return user
 
 '''
@@ -151,10 +151,11 @@ def register_user():
 
         uid = getUserIdFromEmail(flask_login.current_user.id)
         date = time.strftime("%Y-%m-%d")
+        # creates album Unsorted for all unsorted pictures
         createUnsorted(uid, date)
 
-        #return render_template('profile.html', name=firstname, message='Account Created!')
-        return flask.redirect(flask.url_for('profile.html', name=firstname, message='Account Created!'))
+        return render_template('profile.html', firstname=firstname, message='Account Created!')
+        #return flask.redirect(flask.url_for('profile.html', firstname=firstname, message='Account Created!'))
     else:
         print("couldn't find all tokens")
         return render_template('register.html', supress=False)
@@ -171,8 +172,10 @@ def createUnsorted(uid, date):
 def listalbums(uid):
 
     cursor = conn.cursor()
-    unsorted_count = "SELECT COUNT(photoid) FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
+    #unsorted_count = "SELECT COUNT(photoid) FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
+    unsorted_count = "SELECT photoid FROM Photos S WHERE S.album_id = 1 AND S.user_id ='{0}'".format(uid)
     unsorted_count = cursor.execute(unsorted_count)
+    print("unsorted photo count", unsorted_count) ############################ why 1?
     # This hides the album "unsorted" if there are no photos in it
     if (unsorted_count < 1):
         albumnames = "SELECT name " \
