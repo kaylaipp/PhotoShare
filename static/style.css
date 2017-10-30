@@ -69,13 +69,13 @@ div.albums{
 
 img {
     display: block;
-    margin: 0 auto;
+    margin: 1px auto;
     padding-bottom: 2%;
 }
 
 div.caption{
     position: relative;
-    left: 38%
+    left: 28%
 }
 
 

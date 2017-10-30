@@ -574,8 +574,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
