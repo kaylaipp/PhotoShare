@@ -114,11 +114,36 @@ Comments
             {% endfor %}
             </div>
         {% endif %}
+
+            {% if albumnames %}
+                <form method="post" action="{{ url_for('move' )}}">
+                <label for="Move">Move to album:</label>
+                <select id="Move" name="Move">
+
+                {%  for eachAlbum in albumnames %}
+                    {% if eachAlbum[0] != 'Unsorted' and eachAlbum[0] != album%}
+
+                <option value="{{ photo[1] }},{{ album }},{{ eachAlbum[1] }}">{{ eachAlbum[0] }}</option>
+
+                    {% endif %}
+                {%  endfor %}
+
+                <input type="submit" value="Move" /> <br />
+
+                 </select>
+                </form>
+            {% endif %}
+
+
         <a href='/deletepicture/{{ album }}/{{photo[1]}}'>Delete Picture</a>
 
 
     {% endfor %}
 {% endif %}
+
+
+
+
   <div id="nav">
    <ul>
         <li><a href='/profile'>Profile</a></li>

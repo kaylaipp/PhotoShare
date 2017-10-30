@@ -221,6 +221,7 @@ def view_album(album):
         uid = getUserIdFromEmail(flask_login.current_user.id)
         albumid = getAlbumID(uid,album)
         photos = getPhotosFromAlbum(uid,albumid)
+        albumnames = getUsersAlbums(uid)
 
     except:
         print("couldn't find all tokens")
@@ -232,8 +233,34 @@ def view_album(album):
             comments = [getCommentForPicture(each[1])] + comments
     except:
         print("couldn't find all comments")
-        return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
-    return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments, message = message)
+        return render_template('view_album.html', album=album, albumid=albumid, photopath = photos, albumnames = albumnames)
+    return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments, message = message, albumnames = albumnames)
+
+
+@app.route("/move", methods = ['GET','POST'])
+@flask_login.login_required
+def move():
+    psd = request.form.get("Move")
+    psd = psd.split(',')
+ #   print(psd)
+    # pic, src, dest
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    albumid = getAlbumID(uid,psd[1])
+
+    cursor= conn.cursor()
+    albumname = ("SELECT S.name FROM Albums S WHERE S.albumID = '{0}' AND S.albumOwner = '{1}'".format(psd[2],uid))
+    cursor.execute(albumname)
+    albumname = cursor.fetchone()
+#    print(albumname)
+    conn.commit()
+
+    cursor = conn.cursor()
+    query = ("UPDATE Photos SET album_id = '{2}' WHERE album_id = '{1}' AND photoid = '{0}'".format(psd[0],albumid,psd[2]))
+    cursor.execute(query)
+    conn.commit()
+
+    return flask.redirect(flask.url_for('view_album',album=psd[1]))
+
 
 @app.route("/add_comment/<album>/<photo>", methods=['GET', 'POST'])
 def add_comment(album,photo):
@@ -640,6 +667,7 @@ def protected():
     albumnames = listalbums(user)
     numberfriends = friendcount(user)
     taglist = getTopTags()
+
 
     mostCont = getMostContributors()
     print(mostCont)
