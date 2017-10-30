@@ -675,9 +675,6 @@ def showPhotos():
     print('showPhotos(): ', converted)
     return converted
 
-
-
-
 #return a string of recommended friends
 #based on your friend's friend's
 def friend_recommendations():
@@ -717,6 +714,7 @@ def friend_recommendations():
     last = []
     for x in recommendfriends:
         firstname = x[0].encode()
+        #print('firstname: ', firstname[-3:3])
         lastname = x[1].encode()
         first.append(firstname)
         last.append(lastname)
