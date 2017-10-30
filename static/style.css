@@ -27,8 +27,6 @@ div.col-lg-6{
     left: 25%
 }
 
-
-
 #nav {
 
 }
@@ -78,7 +76,6 @@ div.caption{
     left: 28%
 }
 
-    <style>
 
 #nav {
 
@@ -103,8 +100,7 @@ div.caption{
     padding: 14px 16px;
     text-decoration:none;
 }
-#nav li a:focus,{
-
+#nav li a:focus{
     background-color: #111;
 }
-    </style>
+

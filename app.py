@@ -31,8 +31,9 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+#
+# app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -635,8 +636,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -801,34 +802,53 @@ def searchcommentload():
 def searchtagload():
     return render_template('searchtags.html')
 
-
 @app.route('/searchtags', methods = ['GET', 'POST'])
 @flask_login.login_required
 def searchtags():
-    #try:
-        #get list of tags
-        name = request.form.get('tags')
-        name = name.split(' ')
-        print('name: ', name)
+    #split tags by space, in the case where there is > 1 tag searched
+    name = request.form.get('tags')
+    name = name.split(' ')
+    cursor = conn.cursor()
 
-        #go through each tag in taglist and get photos for tag
-        #need to get photopaths for all photos
-        photopaths = []
-        for tag in name:
-            #returns photoid of all photos with certain tag
-            tagged = getTaggedPhotos(tag)
+    photopaths = []
+    for tag in name:
+        photopath = "SELECT photopath FROM PHOTOS P " \
+                    "JOIN Has_Tag H on H.photoId = P.photoID JOIN Tags T on T.tagID = H.tagID " \
+                    "WHERE T.tag = '{0}'".format(tag)
 
-            #tagged returns a tuple and i need it to return an int to put into getPhotoPath
-            print('tagged: ', tagged)
-            for id in tagged:
-                #go through each photoid, and get photopath for each photo
-                photopath = getPhotoPath(id)
-                print('photopath: ', photopath)
-                photopaths.append(photopath)
-            uid = getUserIdFromEmail(flask_login.current_user.id)
-        return render_template('searchtags.html', photos= photopaths,message="Here are all photos tagged with: " + str(name)[3:-2])
-    # except:
-    #     return render_template('searchtags.html', message="No photos found, please try again")
+        cursor.execute(photopath)
+        photopath = cursor.fetchall()
+        photopath = str(photopath)
+        print('photopath: ', photopath[4:-5])
+        # photopath = photopath[3:-3]
+        #This is causing photo not to show
+        photopath = photopath[4:-4]
+        photopaths.append(photopath)
+    return render_template('searchtags.html', photopaths= photopaths,
+                           message="Here are all photos tagged with: " + str(name))
+
+
+# def getTaggedPhotos2(tag_word):
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT p.imgdata, p.photoid FROM Photos p, Has_Tag h, Tags t WHERE h.photoid=p.photoid \
+#                     AND h.tagID=t.tagID AND t.tag='{0}'".format(tag_word))
+#     return cursor.fetchall()
+#
+#
+# @app.route('/searchtags', methods=['GET', 'POST'])
+# def search_tags():
+#     tag_word = request.form.get('tags')
+#     #return render_template('view_album.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos2(tag_word))
+#     print('tag:', tag_word)
+#     for tag in tag_word:
+#         tagged = getTaggedPhotos2(tag)
+#         print('tagged: ', tagged)
+#         photopath = getPhotoPath(tagged)
+#         print('photopath: ', photopath)
+#     return render_template('searchtags.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos2(tag_word))
+
+
+
 
 # default page
 @app.route("/", methods=['GET'])

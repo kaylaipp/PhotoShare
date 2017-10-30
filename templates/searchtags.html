@@ -61,12 +61,10 @@
     <h4>{{message}}:</h4>
     {% endif %}
 
-    {% if photos %}
-        {% if photopath %}
-            {% for photo in photopath %}
-                <img src="../static/uploads/{{ photo }}" style=" width:25%; height:25%;"/>
-            {% endfor %}
-        {% endif %}
+    {% if photopaths %}
+        {% for photo in photopaths %}
+            <img src="../static/uploads/{{ photo }}" style=" width:25%; height:25%;"/>
+        {% endfor %}
     {% endif %}
 
 </body>
