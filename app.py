@@ -33,8 +33,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -477,6 +477,16 @@ def getUsername(uid):
     username = cursor.fetchone()
     return username
 
+def getMyTags(uid):
+    cursor = conn.cursor()
+    cursor.execute("SELECT S.tag from Tags S join has_tag P ON S.tagID=P.tagID left join Photos Q on P.photoid=Q.photoid WHERE Q.user_id = '{0}'".format(uid))
+    return cursor.fetchall()
+
+def getAllTags():
+    cursor = conn.cursor()
+    cursor.execute("SELECT S.tag from (Tags S join has_tag P ON S.tagID=P.tagID left join Photos Q on P.photoid=Q.photoid)")
+    return cursor.fetchall()
+
 def getPhotoOwnerID(photo_id):
 	cursor=conn.cursor()
 	cursor.execute("SELECT P.user_id FROM Photos P WHERE photoid= '{0}'".format(photo_id))
@@ -822,8 +832,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -996,13 +1006,25 @@ def search_comments():
 @app.route('/searchtags')
 @flask_login.login_required
 def searchtagload():
-    return render_template('searchtags.html')
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    mytags = list(getMyTags(uid))
+    for eachtag in range(len(mytags)):
+        mytags[eachtag] = str(mytags[eachtag])[3:-3]
+    alltags = getAllTags()
+    print(mytags)#############################################
+
+    alltags = list(getAllTags())
+    for eachtag in range(len(alltags)):
+        alltags[eachtag] = str(alltags[eachtag])[3:-3]
+    print(alltags)  #############################################
+    return render_template('searchtags.html', mytags = mytags, alltags = alltags)
 
 @app.route('/searchtags', methods = ['GET', 'POST'])
 @flask_login.login_required
 def searchtags():
     #split tags by space, in the case where there is > 1 tag searched
     name = request.form.get('tags')
+
     name = name.split(' ')
     cursor = conn.cursor()
 
