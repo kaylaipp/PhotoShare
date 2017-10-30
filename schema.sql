@@ -109,5 +109,6 @@ CREATE TABLE Likes
   FOREIGN KEY(photoID) REFERENCES Photos(photoID) ON DELETE CASCADE
 );
 
-
+INSERT INTO Users(user_id, firstname, username)
+    VALUES(1,'anonymous', 'anonymous');
 

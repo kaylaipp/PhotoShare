@@ -17,6 +17,8 @@ from flaskext.mysql import MySQL
 #from flask.ext.login import LoginManager
 import flask_login
 import time
+import Tkinter
+import tkMessageBox
 
 # for image uploading
 # from werkzeug import secure_filename
@@ -214,29 +216,34 @@ def listalbums(uid):
 
 @app.route("/view_album/<album>")
 def view_album(album):
-        try:
-            uid = getUserIdFromEmail(flask_login.current_user.id)
-            albumid = getAlbumID(uid,album)
-            photos = getPhotosFromAlbum(uid,albumid)
+    message = ''
+    try:
+        uid = getUserIdFromEmail(flask_login.current_user.id)
+        albumid = getAlbumID(uid,album)
+        photos = getPhotosFromAlbum(uid,albumid)
 
-        except:
-            print("couldn't find all tokens")
-            return render_template('view_album.html', album=album, albumid=albumid)
-        try:
-            comments = []
-            for each in photos:
+    except:
+        print("couldn't find all tokens")
+        return render_template('view_album.html', album=album, albumid=albumid)
+    try:
+        comments = []
+        for each in photos:
 
-                comments = [getCommentForPicture(each[1])] + comments
-        except:
-            print("couldn't find all comments")
-            return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
-        return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments)
+            comments = [getCommentForPicture(each[1])] + comments
+    except:
+        print("couldn't find all comments")
+        return render_template('view_album.html', album=album, albumid=albumid, photopath = photos)
+    return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments, message = message)
 
 @app.route("/add_comment/<album>/<photo>", methods=['GET', 'POST'])
 def add_comment(album,photo):
     if flask.request.method == 'POST':
-        uid = getUserIdFromEmail(flask_login.current_user.id)
-        datetime = time.strftime("%Y-%m-%d %T")
+        try:
+            uid = getUserIdFromEmail(flask_login.current_user.id)
+        except:
+            uid = 1
+        photoOwner = getPhotoOwnerID(photo)
+
         date = time.strftime("%Y-%m-%d")
         comment = request.form.get('comment')
         test = isCommentUnique(comment)
@@ -250,7 +257,8 @@ def add_comment(album,photo):
             cid = getCommentIDFromText(comment)
             cid = cid[0][0]
         insertHasComment(cid,photo,uid)
-        return flask.redirect(flask.url_for('view_album', album=album))
+        return flask.redirect(flask.url_for('browse', album=album))
+    return flask.redirect(flask.url_for('browse'))
 
 
 
@@ -414,6 +422,12 @@ def getPhotoOwner(photo_id):
 	cursor=conn.cursor()
 	cursor.execute("SELECT username FROM Users U, Photos P WHERE photoid= '{0}' AND P.user_id=U.user_id".format(photo_id))
 	return cursor.fetchone()
+
+
+def getPhotoOwnerID(photo_id):
+	cursor=conn.cursor()
+	cursor.execute("SELECT P.user_id FROM Photos P WHERE photoid= '{0}'".format(photo_id))
+	return cursor.fetchone()[0]
 
 #input photoid and get comment texts, username and date from each user
 # def getPhotoComments(photo_id):
@@ -598,7 +612,34 @@ def search_friends():
     except TypeError:
         return render_template('search.html', message="No users found, please try again")
 
+@app.route('/browse', methods = ['GET','POST'])
+def browse():
+    taglist = getTopTags()
+    try:
+        cursor = conn.cursor()
+        query = ("SELECT *, S.firstname, S.lastname, Q.name FROM Photos P LEFT JOIN Users S ON P.user_id = S.user_id LEFT JOIN Albums Q ON P.user_id = Q.albumOwner AND P.album_id = Q.albumID")
+        cursor.execute(query)
+        query = cursor.fetchall()
+        print(query)
 
+    except:
+        print("couldn't find all tokens")
+        return render_template('browse.html', )
+    try:
+        comments = []
+        for each in query:
+
+            comments = [getCommentForPicture(each[0])] + comments
+            print("comments :",comments)
+
+    except:
+        print("couldn't find all comments")
+        return render_template('browse.html',   photopath = query)
+    return render_template('browse.html', tags = taglist, photopath = query, comments = comments)
+
+
+
+        # return render_template('search.html')
 #Should return USERS that created comments that match search
 #return users ordered by number of comments
 #that match the query for each user in descending order
@@ -675,7 +716,7 @@ def create_album():
     if request.method == 'POST':
         albumName = request.form.get('album_title')
         uid = getUserIdFromEmail(flask_login.current_user.id)
-        if isAlbumNameUnique(albumName,uid):
+        if isAlbumNameUnique(albumName,uid) and albumName != '':
             cursor = conn.cursor()
             uid = getUserIdFromEmail(flask_login.current_user.id)
             #albumName = request.form.get('album_title')

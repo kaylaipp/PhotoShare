@@ -1,14 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+
+<!doctype html>
+<html lang = en>
+<!-- author ben lawson (balawson@bu.edu) -->
 <head>
-        <link rel="stylesheet" type="text/css" href="../static/style.css">
-    <link rel="stylesheet" href="https://raw.githubusercontent.com/kaylaipp/PhotoShare/master/templates/pastylesheet.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <meta charset="UTF-8">
-    <title>View Album</title>
-
-<style>
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
+    <title>Browse</title>
+    <style>
 
 #nav {
 
@@ -37,10 +37,7 @@
 
     background-color: #111;
 }
-
-
-
-div.scroll {
+        div.scroll {
     background-color: rgb(224, 224, 224);
     width: 400px;
     height: 250px
@@ -58,17 +55,31 @@ div.datetime{
     font-weight: lighter;
     font-size: smaller;
 }
-
-#bottom {
-    position:fixed;
-    bottom:0;
-}
-</style>
-
+    </style>
 </head>
+
+
 <body>
 
 
+{% if tags %}
+{#    <form method="post" action="all/{{ t }}">#}
+{#     <label for="tag_word">Find photos by tag:</label>#}
+{#     <input type="tag_word" name="tag_word" /><br />#}
+{#</form>#}
+
+
+<h3> Top 5 tags </h3>
+     {% for t in tags %}
+
+         <li><a href='/all/{{t}}'>{{t}}</a> </li>
+
+     {% endfor %}
+{% endif %}
+
+{% if message is none %}
+  <p>You should <a href='/login'>login!</a></p>
+{% endif %}
 
   <h1>{{ album }}</h1>
 {% if message  %}
@@ -82,27 +93,27 @@ div.datetime{
 
 
         <figure>
-        <figcaption>Caption: {{ photo[2] }}    </figcaption>
+        <figcaption>Caption: {{ photo[4] }}       Owner: {{ photo[7] }} {{ photo[8] }}</figcaption>    Album: {{ photo[9] }}
         </figure>
-        <img src="../static/uploads/{{ photo[0] }}"><br>
+        <img src="../static/uploads/{{ photo[5] }}"><br>
 
-{#        <form method="post" action="{{ url_for('add_comment',album=album,photo=photo[1] )}}">#}
-{#        <label for="comment">Add comment:#}
-{#        <input type="text" name="comment"/></label><input type="submit" /><br/>#}
-{#        </form>#}
+        <form method="post" action="{{ url_for('add_comment',album=photo[2],photo=photo[0] )}}">
+        <label for="comment">Add comment:
+        <input type="text" name="comment"></label><input type="submit" /><br/>
+        </form>
 
         {% if comments %}
 
             <div class = scroll>
             {% for each in comments %}
                 {%  for eachcomment in each %}
-                    {% if photo[1] == eachcomment[5] %}
+                    {% if photo[0] == eachcomment[5] %}
                  <p>
                     <div class = commentname>{{ eachcomment[2] }} {{ eachcomment[3] }}</div>
                     {{ eachcomment[0] }}
                     <br>
                     <div class = datetime>{{ eachcomment[1] }}
-                        <a href='/deletecomment/{{ album }}/{{photo[1]}}&{{ eachcomment[0] }}&{{ eachcomment[1] }}&{{ eachcomment[4] }}/'>Delete comment</a></div>
+                        </div>
                     {% endif %}
 
 
@@ -111,23 +122,16 @@ div.datetime{
             {% endfor %}
             </div>
         {% endif %}
-        <a href='/deletepicture/{{ album }}/{{photo[1]}}'>Delete Picture</a>
-
-
     {% endfor %}
 {% endif %}
-  <div id="nav">
-   <ul>
-        <li><a href='/profile'>Profile</a></li>
-        <li><a href='/search'>Search</a></li>
-        <li><a href='/logout'>Logout</a></li>
-       {% if  album  != "Unsorted" %}
-        <li><a href='/deletealbum/{{album}}'>Delete Album</a></li>
-        {% endif %}
+<div id="nav">
+    <ul>
+        <li><a href='/'>Home</a></li>
+        <li><a href='/searchcomments'>Search Comments</a></li>
+        <li><a href='/searchtags'>Search Tags</a></li>
+        <li><a href='/login'>Login</a></li>
+        <li><a href='/register'>Register</a></li>
     </ul>
-      </div>
-
-
-
+</div>
 </body>
 </html>

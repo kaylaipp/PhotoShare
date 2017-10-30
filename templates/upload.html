@@ -1,4 +1,6 @@
+<!DOCTYPE html>
 <!-- author ben lawson (balawson@bu.edu) -->
+<html lang = en>
 <head>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -55,7 +57,9 @@
                      <option value="Unsorted">Decide Later</option>
                 {% if albumname %}
                     {%  for album in albumname %}
+                        {% if album != 'Unsorted' %}
                     <option value="{{ album }}">{{ album }}</option>
+                        {% endif %}
                     {%  endfor %}
 
                 {% endif %}
@@ -68,6 +72,8 @@
        <div id = "nav">
            <ul>
         <li><a href='/profile'>Home</a></li>
+        <li><a href='/browse' >Browse</a></li>
         </ul>
         </div>
     </body>
+</html>
