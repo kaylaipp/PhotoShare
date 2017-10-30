@@ -67,6 +67,37 @@
         </div>
       </form>
     </div>
+
+    {% if mytags %}
+    <form action="/searchtags" method = "post">
+     <label for="mytags">My Tags: </label>
+                <select id="tags" name="tags">
+
+                    {%  for eachmytag in mytags %}
+                         <option value="{{ eachmytag }}">{{ eachmytag }}</option>
+                    {%  endfor %}
+
+                </select>
+    <input type="submit" value="Search" />
+      </form>
+    {% endif %}
+
+    {% if alltags %}
+    <form action="/searchtags" method = "post">
+     <label for="alltags">All Tags: </label>
+                <select id="tags" name="tags">
+
+                    {%  for eachmytag in alltags %}
+                         <option value="{{ eachmytag }}">{{ eachmytag }}</option>
+                    {%  endfor %}
+
+                </select>
+    <input type="submit" value="Search" />
+      </form>
+    {% endif %}
+
+
+
         {% if message %}
     <h4>{{message}}</h4>
     {% endif %}
