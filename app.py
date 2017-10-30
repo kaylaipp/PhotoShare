@@ -260,6 +260,7 @@ def add_comment(album,photo):
             cid = getCommentIDFromText(comment)
             cid = cid[0][0]
         insertHasComment(cid,photo,uid)
+        if uid != 1: contributionscoreINC(uid) #anonymous doesn't count
         return flask.redirect(flask.url_for('browse', album=album))
     return flask.redirect(flask.url_for('browse'))
 
@@ -330,6 +331,13 @@ def isEmailUnique(email):
         return False
     else:
         return True
+
+def hasTag(tagID,photoid):
+    cursor=conn.cursor() # why does this keep coming out true
+    cursor.execute("SELECT tagID, photoid FROM Has_Tag WHERE tagID = '{0}' AND photoid = '{1}'".format(tagID, photoid))
+    test = cursor.fetchall()
+
+    return test!=()
 
 def isCommentUnique(comment):
     cursor=conn.cursor()
@@ -447,6 +455,17 @@ def getPhotoComments(photo_id):
                    "AND P.photoid = '{0}'".format(photo_id))
     return cursor.fetchall() # (comment_text, firstname, lastname))
 
+def contributionscoreINC(user_id):
+    cursor = conn.cursor()
+    cursor.execute("UPDATE Users SET contributions = contributions + 1 WHERE user_id = '{0}' ".format(user_id))
+    conn.commit()
+
+def contributionscoreDEC(user_id):
+    cursor = conn.cursor()
+    cursor.execute("UPDATE Users SET contributions = contributions - 1 WHERE contributions > 0 AND user_id = '{0}' ".format(user_id))
+    conn.commit()
+
+
 
 #delete albums
 @app.route("/deletealbum/<album>", methods=['GET'])
@@ -455,6 +474,9 @@ def delete_album(album):
         uid=getUserIdFromEmail(flask_login.current_user.id)
         cursor=conn.cursor()
         albumid = getAlbumID(uid, album)
+        for x in getPhotosFromAlbum(uid,albumid):
+            contributionscoreDEC(uid)
+            print("DEC_A")
         cursor.execute("DELETE FROM Albums WHERE albumOwner='{0}' AND albumID='{1}'".format(uid,albumid))
         conn.commit()
 
@@ -467,6 +489,11 @@ def delete_album(album):
 
 def deletePhoto(photoID,album):
     cursor = conn.cursor()
+
+    cursor.execute("SELECT photoid, commenterID FROM Has_Comment where photoid = '{0}'".format(photoID))
+    loop = cursor.fetchone()
+    for x in loop: contributionscoreDEC(loop[1])
+    conn.commit()
     cursor.execute("DELETE FROM Has_Comment where photoid = '{0}'".format(photoID))
     conn.commit()
     cursor.execute("DELETE FROM Likes where photoID = '{0}'".format(photoID))
@@ -478,8 +505,11 @@ def deletePhoto(photoID,album):
     cursor.execute("DELETE FROM Photos WHERE photoid='{0}'".format(photoID))
     conn.commit()
     email = flask_login.current_user.id
+    uid = getUserIdFromEmail(email)
     message = "Picture deleted!"
-
+    if uid != 1:
+        contributionscoreDEC(uid)  # anonymous doesn't count
+        print("DEC_p")
     return flask.redirect(flask.url_for('view_album',album=album))
 
 #delete comments
@@ -493,6 +523,8 @@ def deleteComment(album,attrs):
     cdate = attrs[2]
     commenterid = int(attrs[3])
     cid = int(getCommentIDFromText(ctext)[0][0])
+
+    if commenterid != 1: contributionscoreDEC(commenterid)  # anonymous doesn't count
 
     cursor = conn.cursor()
     query = "DELETE FROM Has_Comment WHERE (photoid = %s AND commenterID = %s AND date = %s AND commentID = %s)"
@@ -515,6 +547,17 @@ def displayFriends():
     #print('friend count: ', len(friends))
     #print('friends: ', friends)
     return render_template('friends.html', friends = friends, message = "Your Friends")
+
+def getMostContributors():
+    cursor = conn.cursor()
+    cursor.execute("SELECT S.firstname, S.lastname FROM Users S Where(S.firstname != 'anonymous' )ORDER BY S.contributions DESC LIMIT 10")
+    ret = cursor.fetchall()
+    ret = list(ret)
+
+    for x in range(len(ret)):
+        ret[x] = ret[x][0] +" "+ ret[x][1]
+
+    return ret
 
 def friendcount(uid):
     cursor = conn.cursor()
@@ -553,6 +596,16 @@ def getUserNameUid(uid):
     #name = name[-10:68]
     return name
 
+
+def getTagIDFromTag(tag):
+    cursor = conn.cursor()
+    query = "SELECT tagID FROM Tags WHERE Tags.tag = '{0}'".format(tag)
+    cursor.execute(query)
+    name = cursor.fetchone()
+    print("tagid is ",name)
+    return name
+
+
 # end login code
 
 #display current user profile
@@ -570,9 +623,12 @@ def protected():
     numberfriends = friendcount(user)
     taglist = getTopTags()
 
+    mostCont = getMostContributors()
+    print(mostCont)
+
     return render_template('profile.html', name=flask_login.current_user.id,
                            firstname=name, albumname = albumnames,
-                           photopath = photopath, numberfriends = numberfriends, tags = taglist)
+                           photopath = photopath, numberfriends = numberfriends, tags = taglist, mostCont = mostCont)
 
 # begin photo uploading code
 # photos uploaded using base64 encoding so they can be directly embeded in HTML
@@ -766,6 +822,7 @@ def upload_file():
         query = "INSERT INTO Photos(imgdata, user_id, caption, photopath, album_id) " \
                 "VALUES('{0}', '{1}', '{2}', '{3}','{4}')".format(photo_data, uid, caption, filename_NoPath,album_id)
         cursor.execute(query)
+        contributionscoreINC(uid) #for uploading
 
         # get the photo id
         cursor = conn.cursor()
@@ -782,34 +839,29 @@ def upload_file():
                         lst.append(j)
             elif i != '':
                 lst.append(i)
-        print('tag list: ', lst)
+
 
         #add tags to Tags table
         for word in lst:
             word = str(word)
-            cursor.execute("INSERT INTO Tags (tag) VALUES ('{0}')".format(word))
+            tagID = getTagIDFromTag(word)
+            if tagID == None: #then tag doesn't already exist
+                cursor=conn.cursor()
+                cursor.execute("INSERT INTO Tags(tag) VALUES('{0}')".format(word))
+                conn.commit()
 
-        for tag in lst:
-            cursor = conn.cursor()
-            cursor.execute("SELECT tagID FROM Tags WHERE tag = '{0}'".format(tag))
-            tagID = cursor.fetchall()
-            if len(tagID) == 0:
-                cursor = conn.cursor()
-                cursor.execute("INSERT INTO Tags (tag) VALUES ('{0}')".format(tag))
-                cursor = conn.cursor()
-                cursor.execute("SELECT MAX(tagID) from Tags")
-                tagID = cursor.fetchall()
+            # add to has tags
+            tagID = getTagIDFromTag(word)
 
-        #add tags to has_tags table
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT tagID, photoid FROM Has_Tag WHERE tagID = '{0}' AND photoid='{1}'".format(tagID[0][0],
-                                                                                                      photoid))
-        result = cursor.fetchall()
-        if len(result) == 0:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO Has_Tag (tagID, photoid) VALUES ('{0}', '{1}')".format(tagID[0][0], photoid))
+            tagStatus = hasTag(tagID[0], photoid)
+
+            if not tagStatus:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "INSERT INTO Has_Tag(tagID, photoid) VALUES ('{0}', '{1}')".format(tagID[0], photoid))
+                conn.commit()
+
+
 
         #figuring out path for photo
         # path = "/Users/kaylaippongi/Desktop/Photoshare/uploads/{}".format(str(album_id)) \

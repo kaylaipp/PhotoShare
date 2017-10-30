@@ -38,6 +38,12 @@
 
     background-color: #111;
 }
+
+ul{
+    list-style-type:none;
+    text-align:center;
+}
+
     </style>
     <!-- I CANNOT figure out how to get this to work with an external css sheet so it's here now -->
 
@@ -109,10 +115,20 @@
 <h3> Top 5 tags </h3>
      {% for t in tags %}
 
-         <li><a href='/all/{{t}}'>{{t}}</a> </li>
+         <ul><li><a href='/all/{{t}}'>{{t}}</a> </li></ul>
 
      {% endfor %}
 {% endif %}
+
+{% if mostCont %}
+<h3> Top 10 Users </h3>
+     {% for f in mostCont %}
+
+         <ul><li>{{ f }}</li></ul>
+
+     {% endfor %}
+{% endif %}
+
 
 {% if message is none %}
   <p>You should <a href='/login'>login!</a></p>
