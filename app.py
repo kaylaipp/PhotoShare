@@ -617,6 +617,8 @@ def search_friends():
 
 @app.route('/browse', methods = ['GET','POST'])
 def browse():
+
+
     taglist = getTopTags()
     try:
         cursor = conn.cursor()
