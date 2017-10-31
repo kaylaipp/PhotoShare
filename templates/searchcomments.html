@@ -66,7 +66,7 @@ div.input-group{
         <h4>Users that have commented:</h4>
         {{ commment }}
         {% for user in users %}
-        <li>{{ user[0] }}</li>
+        <li><strong>@{{ user[0] }} </strong>  {{ user[1] }}    {{ user[2] }}</li>
         {% endfor %}
     {% endif %}
 

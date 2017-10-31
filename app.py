@@ -1042,6 +1042,10 @@ def search_comments():
                 "FROM Comments C JOIN Users U on U.user_id = C.userID " \
                 "WHERE text = '{0}'".format(comments)
 
+        # user = "SELECT U.username, C.text, H.date " \
+        #         "FROM Has_Comments H JOIN Users U on U.user_id = H.commenterID " \
+        #         "WHERE C.text = '{0}'".format(comments)
+
         #search += user
         #print(search)
         result = cursor.execute(user)
