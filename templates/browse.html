@@ -59,81 +59,79 @@ div.datetime{
     font-weight: lighter;
     font-size: smaller;
 }
-
-
     </style>
+
 </head>
-
-
 <body>
 
+<div id="browse_body">
+    {% if tags %}
+    {#    <form method="post" action="all/{{ t }}">#}
+    {#     <label for="tag_word">Find photos by tag:</label>#}
+    {#     <input type="tag_word" name="tag_word" /><br />#}
+    {#</form>#}
 
-{% if tags %}
-{#    <form method="post" action="all/{{ t }}">#}
-{#     <label for="tag_word">Find photos by tag:</label>#}
-{#     <input type="tag_word" name="tag_word" /><br />#}
-{#</form>#}
+    <h3> Top 5 tags </h3>
+         {% for t in tags %}
 
+             <ul><li><a href='/searchtags/{{t}}'>{{t}}</a> </li></ul>
 
-<h3> Top 5 tags </h3>
-     {% for t in tags %}
+         {% endfor %}
+    {% endif %}
 
-         <ul><li><a href='/searchtags/{{t}}'>{{t}}</a> </li></ul>
+    {% if message is none %}
+      <p>You should <a href='/login'>login!</a></p>
+    {% endif %}
 
-     {% endfor %}
-{% endif %}
-
-{% if message is none %}
-  <p>You should <a href='/login'>login!</a></p>
-{% endif %}
-
-  <h1>{{ album }}</h1>
-{% if message  %}
-  <h3>{{ message }}</h3>
-{% endif %}
-
+      <h1>{{ album }}</h1>
+    {% if message  %}
+      <h3>{{ message }}</h3>
+    {% endif %}
 
 
-{% if photopath %}
+    {% if photopath %}
 
-    {% for photo in photopath %}
-        <div style='height: 500px; width: 500px; background-color: white'>
-        <img src="../static/uploads/{{ photo[5] }}"style="width: 100%; height: 100%; object-fit: contain"><br>
+        {% for photo in photopath %}
+            <div class = "image">
+            <div style='height: 500px; width: 500px; background-color: white; overflow: hidden; display: block'>
+            <img src="../static/uploads/{{ photo[5] }}"style="width: 100%; height: 100%; object-fit: contain"><br>
+            </div>
+
+            <div class = "comment_section">
+
+                <figure>
+                    <figcaption> <strong>@{{ photo[9] }}</strong> {{ photo[4] }}</figcaption>    Album: {{ photo[9] }}
+                </figure>
+{#                <figcaption>Caption: {{ photo[4] }} Owner: {{ photo[7] }} {{ photo[8] }}</figcaption>    Album: {{ photo[9] }}#}
+{#                </figure>#}
+
+                    <form method="post" action="{{ url_for('add_comment',album=photo[2],photo=photo[0] )}}">
+                    <label for="comment">Add comment:
+                    <input type="text" name="comment"></label><input type="submit" /><br/>
+                    </form>
+
+                    {% if comments %}
+
+                        <div class = scroll>
+                        {% for each in comments %}
+                            {%  for eachcomment in each %}
+                                {% if photo[0] == eachcomment[5] %}
+                             <p>
+                                <div class = commentname>{{ eachcomment[2] }} {{ eachcomment[3] }}</div>
+                                {{ eachcomment[0] }}
+                                <br>
+                                <div class = datetime>{{ eachcomment[1] }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                        </div>
+                    {% endif %}
+            </div>
         </div>
-        <div class = 'commentsection'>
-
-        <figure>
-        <figcaption>Caption: {{ photo[4] }} Owner: {{ photo[7] }} {{ photo[8] }}</figcaption>    Album: {{ photo[9] }}
-        </figure>
-
-
-
-            <form method="post" action="{{ url_for('add_comment',album=photo[2],photo=photo[0] )}}">
-            <label for="comment">Add comment:
-            <input type="text" name="comment"></label><input type="submit" /><br/>
-            </form>
-
-            {% if comments %}
-
-                <div class = scroll>
-                {% for each in comments %}
-                    {%  for eachcomment in each %}
-                        {% if photo[0] == eachcomment[5] %}
-                     <p>
-                        <div class = commentname>{{ eachcomment[2] }} {{ eachcomment[3] }}</div>
-                        {{ eachcomment[0] }}
-                        <br>
-                        <div class = datetime>{{ eachcomment[1] }}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-
-    {% endfor %}
-{% endif %}
+        {% endfor %}
+    {% endif %}
+</div>
 <div id="nav">
     <ul>
         <li><a href='/profile'>Profile</a></li>

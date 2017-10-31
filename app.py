@@ -637,6 +637,8 @@ def friendcount(uid):
 #@flask_login.login_required
 def getUserId(first_name, last_name):
     cursor = conn.cursor()
+    print 'getuserid: ', first_name
+    print 'getuserid: ', last_name
     query = "SELECT user_id " \
             "FROM Users WHERE firstname='{0}' AND lastname='{1}'".format(first_name, last_name)
 
@@ -786,24 +788,51 @@ def browse():
 #     photos = getUsersPhotos(uid)
 #     return render_template('friendprofile.html', firstname='firstname', lastname='lastname', photo=photos)
 
-#Works!
+#Semi-Works!
+# need to fix formatting for outputing names
+# and actually adding them
 #After searching for users, clicking on a user will add you as a friend
+# @app.route('/addfriend/<user>', methods=['GET'])
+# #@flask_login.login_required
+# def addfriends(user):
+#     try:
+#         uid = getUserIdFromEmail(flask_login.current_user.id)
+#         print('user uid: ', uid)
+#         print('friend uid: ', user )
+#         user = int(user)
+#         cursor = conn.cursor()
+#         query = "INSERT INTO Friends (userID1, userID2)" \
+#                 "VALUES ('{0}', '{1}')".format(uid, user)
+#         cursor.execute(query)
+#         conn.commit()
+#         return render_template('/search.html', message = "added friend!")
+#     except:
+#         return render_template('/search.html', message="you're already friends with this user!")
+
+# #After searching for users, clicking on a user will add you as a friend
 @app.route('/addfriend/<user>', methods=['GET'])
-#@flask_login.login_required
+@flask_login.login_required
 def addfriends(user):
-    try:
+    #try:
         uid = getUserIdFromEmail(flask_login.current_user.id)
-        print('user uid: ', uid)
-        print('friend uid: ', user )
-        user = int(user)
+        #print('user uid: ', uid)
+        print('friend: ', user )
+        #firstname = user[-1]
+        fullname = user.replace('(', ' ').replace('u','').replace(')', '').split(',')
+        firstname = fullname[0].encode()
+        lastname = fullname[1].encode()
+        print('friend: ', firstname)
+        print('friend: ', lastname)
+        friendid = getUserId(firstname[2:-1], lastname[2:-1])
+        print('friendid: ', friendid)
         cursor = conn.cursor()
         query = "INSERT INTO Friends (userID1, userID2)" \
-                "VALUES ('{0}', '{1}')".format(uid, user)
+                "VALUES ('{0}', '{1}')".format(uid, friendid)
         cursor.execute(query)
         conn.commit()
         return render_template('/search.html', message = "added friend!")
-    except:
-        return render_template('/search.html', message="you're already friends with this user!")
+    #except:
+        #return render_template('/search.html', message="you're already friends with this user!")
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -964,11 +993,13 @@ def friend_recommendations():
     first = []
     last = []
     for x in recommendfriends:
-        firstname = x[0].encode()
+        #firstname = x[0].encode()
         #print('firstname: ', firstname[-3:3])
-        lastname = x[1].encode()
-        first.append(firstname)
-        last.append(lastname)
+        #lastname = x[1].encode()
+        # first.append(firstname)
+        # last.append(lastname)
+        first.append(x[0])
+        last.append(x[1])
     final = zip(first,last)
     print('final: ', final)
     return final
@@ -985,21 +1016,24 @@ def searchcommentload():
 @app.route('/searchcomments',methods=['GET','POST'])
 @flask_login.login_required
 def search_comments():
-    comments = request.form.get('comments')
-    print('searchcomments: ', comments)
-    # comments = comments.split(' ')
-    # cursor = conn.cursor()
-    #search = " "
-    user = "SELECT U.username " \
-            "FROM Comments C JOIN Users U on U.user_id = C.userID " \
-            "WHERE text = '{0}'".format(comments)
+    try:
+        comments = request.form.get('comments')
+        print('searchcomments: ', comments)
+        # comments = comments.split(' ')
+        # cursor = conn.cursor()
+        #search = " "
+        user = "SELECT U.username " \
+                "FROM Comments C JOIN Users U on U.user_id = C.userID " \
+                "WHERE text = '{0}'".format(comments)
 
-    #search += user
-    #print(search)
-    result = cursor.execute(user)
-    result = cursor.fetchall()
-    print('searchcomments user: ', result)
-    return render_template('searchcomments.html', users = result, comment = comments)
+        #search += user
+        #print(search)
+        result = cursor.execute(user)
+        result = cursor.fetchall()
+        print('searchcomments user: ', result)
+        return render_template('searchcomments.html', users = result, comment = comments)
+    except:
+        return render_template('searchcomments.html', message = "No user's have commented something like that, try again :) ")
 
 
 

@@ -30,7 +30,7 @@ body {
 
 div.col-lg-6{
     position: relative;
-    left: 25%
+    left: 25%;
 }
 
 #nav {
@@ -97,8 +97,7 @@ div.caption{
 #comment.scroll {
     background-color: rgb(186, 186, 186);
     width: 400px;
-    height: 250px
-    ;
+    height: 250px;
     overflow: scroll;
 }
 div.comment{
@@ -115,7 +114,28 @@ div#profile_info{
     top:8%;
 }
 
+div#browse_body{
+    position: relative;
+    top: 3%;
+    padding-bottom: -10%;
+}
+
 div.gallery{
     position: relative;
-    left: 20%
+    left: 20%;
 }
+
+div.image {
+    position: relative;
+    right: 230px;
+    display: block;
+    vertical-align: top;
+}
+
+div.comment_section{
+    position: relative;
+    left: 100%;
+    top: -440px;
+
+}
+

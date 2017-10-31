@@ -50,7 +50,7 @@
 {#    </div>#}
 <div id="nav">
     <ul>
-        <li><a href='profile/'>Profile</a></li>
+        <li><a href='/profile'>Profile</a></li>
         <li><a href='/new_album'>Create new album</a></li>
         <li><a href='/upload'>Upload a photo</a></li>
         <li><a href='/search'>Search Users</a></li>
@@ -86,22 +86,23 @@
     {% if users %}
         {% for user in users %}
 {#        <!--<li><a href="/friendprofile/{{user[0]}}"> {{user[1] + ' ' + user[2]}} </a></li>-->#}
+            {{ user }}
             <li><a href="/addfriend/{{user[0]}}"> {{user[1] + ' ' + user[2]}} </a></li>
         {% endfor %}
     {% endif %}
 
-    {% if friends %}
-        {% for friend in friends %}
-        <li>{{friend[0] +' '+friend[1]}}</li>
-        {% endfor %}
-    {% endif %}
+{#    {% if friends %}#}
+{#        {% for friend in friends %}#}
+{#        <li>{{friend[0] +' '+friend[1]}}</li>#}
+{#        {% endfor %}#}
+{#    {% endif %}#}
 
     <h4>Add at least 1 friend to see friend recommendations!</h4>
 {#    {% if friendrecs %}#}
         {% for friend in friendrecs %}
             <h4>Users To Add</h4>
 {#            <li><a href="/addfriend/{{friend[0]}}"> {{friend[1] + ' ' + friend[2]}} </a></li>#}
-            <li><a href="/addfriend/{{friend}}"> {{ friend }} </a></li>
+            <li><a href="/addfriend/{{friend}}"> {{ friend[0] +' ' + friend[1] }} </a></li>
         {% endfor %}
 {#    {% endif %}#}
 
