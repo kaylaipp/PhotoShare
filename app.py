@@ -221,6 +221,7 @@ def view_album(album):
         uid = getUserIdFromEmail(flask_login.current_user.id)
         albumid = getAlbumID(uid,album)
         photos = getPhotosFromAlbum(uid,albumid)
+
         albumnames = getUsersAlbums(uid)
 
     except:
@@ -229,7 +230,8 @@ def view_album(album):
     try:
         comments = []
         for each in photos:
-
+            #numlikes = getnumlikes(each[2])
+            #print('numlikes: ', numlikes)
             comments = [getCommentForPicture(each[1])] + comments
     except:
         print("couldn't find all comments")
@@ -1058,7 +1060,7 @@ def search_comments():
 
 
 @app.route('/searchtags')
-@flask_login.login_required
+#@flask_login.login_required
 def searchtagload():
     uid = getUserIdFromEmail(flask_login.current_user.id)
     mytags = list(getMyTags(uid))
@@ -1074,7 +1076,7 @@ def searchtagload():
     return render_template('searchtags.html', mytags = mytags, alltags = alltags)
 
 @app.route('/searchtags', methods = ['GET', 'POST'])
-@flask_login.login_required
+#@flask_login.login_required
 def searchtags():
     #split tags by space, in the case where there is > 1 tag searched
     name = request.form.get('tags')
@@ -1107,7 +1109,7 @@ def searchtags():
 #when one of the top 5 tags is clicked
 #return list of photopaths for all photos
 @app.route('/searchtags/<tag>', methods = ['GET', 'POST'])
-@flask_login.login_required
+#@flask_login.login_required
 def searchtags2(tag):
     photopaths = []
     #returns tuple of all photopaths
@@ -1154,7 +1156,7 @@ def searchtags2(tag):
 #     return render_template('searchtags.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos2(tag_word))
 
 @app.route('/like/<photo>', methods=['GET','POST'])
-@flask_login.login_required
+#@flask_login.login_required
 def like_photo(photo):
     print('photo: ', photo)
     #get photopath and remove excess characters
@@ -1164,7 +1166,7 @@ def like_photo(photo):
     print('photopath: ', photopath)
     photopath = photopath[4:-5]
     print('photopath: ', photopath)
-    users = like_users(photo)       #returns USERNAME
+    users = like_users(photo)  # returns USERNAME
     print('users who liked: ', users)
     # listusernames =[]
     # for id in users:
@@ -1174,10 +1176,15 @@ def like_photo(photo):
     # print('listusernames: ', listusernames)
     # print('like_photo: ', users )
     try:
-        uid = getUserIdFromEmail(flask_login.current_user.id)
+        try:
+            uid = getUserIdFromEmail(flask_login.current_user.id)
+        except:
+            uid = 1 #anonymous!!!
         cursor=conn.cursor()
         cursor.execute("INSERT INTO Likes (userID, photoID) VALUES ('{0}', '{1}')".format(uid,photo))
         conn.commit()
+        users = like_users(photo)  # returns USERNAME
+        print('users after insert: ', users)
         return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=users, owner=getPhotoOwner(photo), comments=getPhotoComments(photo), message="Liked!")
     except:
         return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=users, owner = getPhotoOwner(photo), comments=getPhotoComments(photo),message="You've already liked this photo!")
