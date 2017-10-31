@@ -33,8 +33,8 @@ app.secret_key = 'super secret string'  # Change this!
 
 # These will need to be changed according to your credentials
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
-#app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
+#app.config['MYSQL_DATABASE_PASSWORD'] = 'BOston2019!'
+app.config['MYSQL_DATABASE_PASSWORD'] = '940804'
 app.config['MYSQL_DATABASE_DB'] = 'photoshare'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 
@@ -217,15 +217,18 @@ def listalbums(uid):
 @app.route("/view_album/<album>")
 def view_album(album):
     message = ''
+
     try:
         uid = getUserIdFromEmail(flask_login.current_user.id)
         albumid = getAlbumID(uid,album)
-        photos = getPhotosFromAlbum(uid,albumid)
+        photos = getPhotosFromAlbum(uid,albumid) #path, id, caption
         albumnames = getUsersAlbums(uid)
 
     except:
         print("couldn't find all tokens")
-        return render_template('view_album.html', album=album, albumid=albumid)
+        return render_template('view_album.html', album=album)
+
+
     try:
         comments = []
         for each in photos:
@@ -233,8 +236,17 @@ def view_album(album):
             comments = [getCommentForPicture(each[1])] + comments
     except:
         print("couldn't find all comments")
+
+    try:
+        numlikes = []
+        print("numlikes",getnumlikes(11))
+        for each in photos:
+            numlikes.append(getnumlikes(each[1]))
+        print(numlikes)
+    except:
+        print("couldnt get all likes")
         return render_template('view_album.html', album=album, albumid=albumid, photopath = photos, albumnames = albumnames)
-    return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments, message = message, albumnames = albumnames)
+    return render_template('view_album.html', album = album, photopath = photos, albumid = albumid, comments = comments, message = message, albumnames = albumnames, numlikes = numlikes)
 
 
 @app.route("/move", methods = ['GET','POST'])
@@ -467,7 +479,7 @@ def getTags(photo):
 #input photoid and return USERNAMES that have liked photo
 def like_users(photo):
 	cursor=conn.cursor()
-	cursor.execute("SELECT U.username FROM Likes L, Users U WHERE photoID ='{0}' AND U.user_id = L.userID".format(photo))
+	cursor.execute("SELECT U.username FROM Likes L LEFT JOIN Users U ON L.userID = U.user_id WHERE photoID ='{0}' AND U.user_id = L.userID".format(photo))
 	return cursor.fetchall()
 
 #input photoid and get username for owner
@@ -870,8 +882,8 @@ def create_album():
 @app.route('/upload', methods=['GET', 'POST'])
 @flask_login.login_required
 def upload_file():
-    Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
-    #Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
+    #Uploads = '/Users/kaylaippongi/Desktop/PhotoShare/static/uploads'
+    Uploads = '/Volumes/Old_HDD/Users/Yuta/Spock_Stuff/BU/CS460/PA1/PhotoShare1/static/uploads/'
     app.config['Uploads'] = Uploads
 
     if request.method == 'POST':
@@ -1154,7 +1166,7 @@ def searchtags2(tag):
 #     return render_template('searchtags.html', message="Here are the pictures with the tag", tag=tag_word, tagged=getTaggedPhotos2(tag_word))
 
 @app.route('/like/<photo>', methods=['GET','POST'])
-@flask_login.login_required
+#@flask_login.login_required
 def like_photo(photo):
     print('photo: ', photo)
     #get photopath and remove excess characters
@@ -1164,7 +1176,7 @@ def like_photo(photo):
     print('photopath: ', photopath)
     photopath = photopath[4:-5]
     print('photopath: ', photopath)
-    users = like_users(photo)       #returns USERNAME
+    users = like_users(photo)       #returns USERNAME ###########################################
     print('users who liked: ', users)
     # listusernames =[]
     # for id in users:

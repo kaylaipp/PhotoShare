@@ -72,7 +72,9 @@ div.datetime{
 {% if picture %}
 {#<a href= '/photo/{{picture[2]}}'><img src='data:image/png;base64, {{picture[0]}}'/></a><br>#}
 {#<i>{{picture[1]}}</i><br>#}
-    <img src="../static/uploads/{{ picture}}" style="height: 30%; width: 30%;"><br>
+    <div style='height: 500px; width: 500px; background-color: white; overflow: hidden; display: block'>
+    <img src="../static/uploads/{{ picture}}" style="height: 100%; width: 100%; object-fit: contain"><br>
+    </div>
 Posted by: {{owner[0]}}<br>
 
 
