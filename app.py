@@ -408,6 +408,18 @@ def getTopTags():
         converted.append(tag[3:-3])
     return converted
 
+
+def getUsersTopTags(uid):
+    cursor = conn.cursor()
+    query = "SELECT tag FROM Tags, Users GROUP BY tag ORDER BY COUNT(*) DESC LIMIT 5 WHERE user_id = '{0}'".format(uid)
+    taglist = cursor.execute(query)
+    taglist = cursor.fetchall()
+    converted = []
+    for tag in taglist:
+        tag = str(tag)
+        converted.append(tag[3:-3])
+    return converted
+
 #should return photoid, as imgdata is blank
 def getTaggedPhotos(tag_word):
     cursor = conn.cursor()
@@ -452,10 +464,10 @@ def getTags(photo):
 	cursor.execute("SELECT tag FROM Tags T JOIN Has_Tag H on H.tagID = T.tagID WHERE H.photoid = '{0}'".format(photo))
 	return cursor.fetchall()
 
-#input photoid and return users that have liked photo
+#input photoid and return USERNAMES that have liked photo
 def like_users(photo):
 	cursor=conn.cursor()
-	cursor.execute("SELECT userID FROM Likes L, Users U WHERE photoID ='{0}' AND U.user_id = L.userID".format(photo))
+	cursor.execute("SELECT U.username FROM Likes L, Users U WHERE photoID ='{0}' AND U.user_id = L.userID".format(photo))
 	return cursor.fetchall()
 
 #input photoid and get username for owner
@@ -732,7 +744,6 @@ def search_friends():
 @app.route('/browse', methods = ['GET','POST'])
 def browse():
 
-
     taglist = getTopTags()
     try:
         cursor = conn.cursor()
@@ -755,8 +766,6 @@ def browse():
         print("couldn't find all comments")
         return render_template('browse.html',   photopath = query)
     return render_template('browse.html', tags = taglist, photopath = query, comments = comments)
-
-
 
 
 
@@ -1004,6 +1013,9 @@ def friend_recommendations():
     print('final: ', final)
     return final
 
+
+
+
 @app.route('/searchcomments')
 @flask_login.login_required
 def searchcommentload():
@@ -1022,7 +1034,11 @@ def search_comments():
         # comments = comments.split(' ')
         # cursor = conn.cursor()
         #search = " "
-        user = "SELECT U.username " \
+        # user = "SELECT U.username " \
+        #         "FROM Comments C JOIN Users U on U.user_id = C.userID " \
+        #         "WHERE text = '{0}'".format(comments)
+
+        user = "SELECT U.username, C.text, C.date " \
                 "FROM Comments C JOIN Users U on U.user_id = C.userID " \
                 "WHERE text = '{0}'".format(comments)
 
@@ -1136,6 +1152,7 @@ def searchtags2(tag):
 @app.route('/like/<photo>', methods=['GET','POST'])
 @flask_login.login_required
 def like_photo(photo):
+    print('photo: ', photo)
     #get photopath and remove excess characters
     photopath = getPhotoPath(photo)
     print('photopath: ', photopath)
@@ -1143,22 +1160,61 @@ def like_photo(photo):
     print('photopath: ', photopath)
     photopath = photopath[4:-5]
     print('photopath: ', photopath)
-    users = like_users(photo)       #returns user_id
-    listusernames =[]
-    for id in users:
-        print('id: ', str(id)[1:-1])
-        username = getUsername(str(id)[1:-1])
-        listusernames.append(username)
-    print('listusernames: ', listusernames)
-    print('like_photo: ', users )
+    users = like_users(photo)       #returns USERNAME
+    print('users who liked: ', users)
+    # listusernames =[]
+    # for id in users:
+    #     print('id: ', str(id)[1:-1])
+    #     username = getUsername(str(id)[1:-1])
+    #     listusernames.append(username)
+    # print('listusernames: ', listusernames)
+    # print('like_photo: ', users )
     try:
         uid = getUserIdFromEmail(flask_login.current_user.id)
         cursor=conn.cursor()
         cursor.execute("INSERT INTO Likes (userID, photoID) VALUES ('{0}', '{1}')".format(uid,photo))
         conn.commit()
-        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=listusernames, owner=getPhotoOwner(photo), comments=getPhotoComments(photo), message="Liked!")
+        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=users, owner=getPhotoOwner(photo), comments=getPhotoComments(photo), message="Liked!")
     except:
-        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=listusernames, owner = getPhotoOwner(photo), comments=getPhotoComments(photo),message="You've already liked this photo!")
+        return render_template('photo.html',picture=photopath, tags=getTags(photo), likes=getnumlikes(photo), users=users, owner = getPhotoOwner(photo), comments=getPhotoComments(photo),message="You've already liked this photo!")
+
+@app.route('/explore')
+@flask_login.login_required
+def explorepageload():
+    return render_template('explore.html')
+
+
+#like browse page, but photos shouldn't be users...
+@app.route('/explore', methods = ['GET','POST'])
+@flask_login.login_required
+def explore():
+    uid = getUserIdFromEmail(flask_login.current_user.id)
+    taglist = getUsersTopTags(uid)
+    print('taglist: ', taglist)
+    try:
+        print('test')
+        cursor = conn.cursor()
+        query = ("SELECT *, S.firstname, S.lastname, Q.name FROM Photos P LEFT JOIN Users S ON P.user_id = S.user_id LEFT JOIN Albums Q ON P.user_id = Q.albumOwner AND P.album_id = Q.albumID")
+        cursor.execute(query)
+        query = cursor.fetchall()
+        print('explore query: ', query)
+
+    except:
+        print("couldn't find all tokens")
+        return render_template('explore.html', )
+    try:
+        comments = []
+        for each in query:
+
+            comments = [getCommentForPicture(each[0])] + comments
+            print("comments :",comments)
+
+    except:
+        print("couldn't find all comments")
+        print("error")
+        return render_template('explore.html',   photopath = query)
+    return render_template('explore.html', tags = taglist, photopath = query, comments = comments)
+
 
 # default page
 @app.route("/", methods=['GET'])

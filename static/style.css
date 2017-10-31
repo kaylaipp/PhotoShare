@@ -139,3 +139,18 @@ div.comment_section{
 
 }
 
+div.input-group{
+    position: relative;
+    left:22%;
+}
+
+div.view_album_info{
+    position: relative;
+    top: 7%;
+}
+
+div.va_photos{
+    position: relative;
+    /*right: 250px;*/
+}
+

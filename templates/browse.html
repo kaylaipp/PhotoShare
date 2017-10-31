@@ -102,6 +102,7 @@ div.datetime{
                 <figure>
                     <figcaption> <strong>@{{ photo[9] }}</strong> {{ photo[4] }}</figcaption>    Album: {{ photo[9] }}
                 </figure>
+                <br><a href='/like/{{photo[0]}}'>Like!</a>
 {#                <figcaption>Caption: {{ photo[4] }} Owner: {{ photo[7] }} {{ photo[8] }}</figcaption>    Album: {{ photo[9] }}#}
 {#                </figure>#}
 
@@ -141,7 +142,6 @@ div.datetime{
         <li><a href='/searchcomments'>Search Comments</a></li>
         <li><a href='/searchtags'>Search Tags</a></li>
         <li><a href='/browse' >Browse</a></li>
-
         <li><a href='/logout'>Logout</a></li>
     </ul>
 </div>
